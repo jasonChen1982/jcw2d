@@ -1,0 +1,22 @@
+{
+  "name": "jcw2d",
+  "version": "0.0.1",
+  "description": "webgl 2d 2.5d jc canvas",
+  "main": "src/jcw2d.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.ucweb.local:redfe/jcw2d.git"
+  },
+  "keywords": [
+    "webgl",
+    "2d",
+    "2.5d",
+    "jc",
+    "canvas"
+  ],
+  "author": "jasonChen",
+  "license": "ISC"
+}
