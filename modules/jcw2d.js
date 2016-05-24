@@ -2,44 +2,45 @@
 
     var root = this;
 
-    var PIXI = PIXI || {};
+    var JC = JC || {};
 
-    PIXI.VERSION = "v0.0.5";
+    JC.VERSION = "v0.0.5";
 
-    PIXI.blendModes = {
+    JC.blendModes = {
         NORMAL: 0,
-        ADD: 1,
-        MULTIPLY: 2,
-        SCREEN: 3
+        ALPHA: 1,
+        ADD: 2,
+        MULTIPLY: 3,
+        SCREEN: 4
     };
 
-    PIXI.scaleModes = {
+    JC.scaleModes = {
         DEFAULT: 0,
         LINEAR: 0,
         NEAREST: 1
     };
 
-    PIXI._UID = 0;
+    JC._UID = 0;
 
     if (typeof(Float32Array) != 'undefined') {
-        PIXI.Float32Array = Float32Array;
-        PIXI.Uint16Array = Uint16Array;
+        JC.Float32Array = Float32Array;
+        JC.Uint16Array = Uint16Array;
 
-        PIXI.Uint32Array = Uint32Array;
-        PIXI.ArrayBuffer = ArrayBuffer;
+        JC.Uint32Array = Uint32Array;
+        JC.ArrayBuffer = ArrayBuffer;
     } else {
-        console.log('%c not support', 'color: #fff;background: #f00;');
+        console.log('%c not support WebGL ', 'color: #fff;background: #f00;');
     }
 
-    PIXI.PI_2 = Math.PI * 2;
+    JC.PI_2 = Math.PI * 2;
 
-    PIXI.RTD = 180 / Math.PI;
+    JC.RTD = 180 / Math.PI;
 
-    PIXI.DTR = Math.PI / 180;
+    JC.DTR = Math.PI / 180;
 
-    PIXI.dontSpeek = false;
+    JC.dontSpeek = false;
 
-    PIXI.defaultRenderOptions = {
+    JC.defaultRenderOptions = {
         view: null,
         transparent: false,
         antialias: false,
@@ -49,12 +50,12 @@
         autoResize: false
     };
 
-    PIXI.sayHello = function(type) {
-        if (PIXI.dontSpeek) return;
+    JC.sayHello = function(type) {
+        if (JC.dontSpeek) return;
 
         if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
             var args = [
-                '%c %c %c Pixi.js ' + PIXI.VERSION + ' - ' + type + '  %c ' + ' %c ' + ' http://www.pixijs.com/  %c %c ♥%c♥%c♥ ',
+                '%c %c %c JC.js ' + JC.VERSION + ' - ' + type + '  %c ' + ' %c ' + ' http://www.JCjs.com/  %c %c ♥%c♥%c♥ ',
                 'background: #ff66a5',
                 'background: #ff66a5',
                 'color: #ff66a5; background: #030307;',
@@ -69,23 +70,23 @@
             console.log.apply(console, args);
         }
 
-        PIXI.dontSpeek = true;
+        JC.dontSpeek = true;
     };
 
 
-    PIXI.Point = function(x, y) {
+    JC.Point = function(x, y) {
         this.x = x || 0;
 
         this.y = y || 0;
     };
-    PIXI.Point.prototype.clone = function() {
-        return new PIXI.Point(this.x, this.y);
+    JC.Point.prototype.clone = function() {
+        return new JC.Point(this.x, this.y);
     };
-    PIXI.Point.prototype.set = function(x, y) {
+    JC.Point.prototype.set = function(x, y) {
         this.x = x || 0;
         this.y = y || ((y !== 0) ? this.x : 0);
     };
-    PIXI.Point.prototype.constructor = PIXI.Point;
+    JC.Point.prototype.constructor = JC.Point;
 
 
     /**
@@ -98,7 +99,7 @@
      * @class Matrix
      * @constructor
      */
-    PIXI.Matrix = function() {
+    JC.Matrix = function() {
         this.a = 1;
         this.b = 0;
         this.c = 0;
@@ -106,7 +107,7 @@
         this.tx = 0;
         this.ty = 0;
     };
-    PIXI.Matrix.prototype.fromArray = function(array) {
+    JC.Matrix.prototype.fromArray = function(array) {
         this.a = array[0];
         this.b = array[1];
         this.c = array[3];
@@ -114,8 +115,8 @@
         this.tx = array[2];
         this.ty = array[5];
     };
-    PIXI.Matrix.prototype.toArray = function(transpose) {
-        if (!this.array) this.array = new PIXI.Float32Array(9);
+    JC.Matrix.prototype.toArray = function(transpose) {
+        if (!this.array) this.array = new JC.Float32Array(9);
         var array = this.array;
 
         if (transpose) {
@@ -142,16 +143,16 @@
 
         return array;
     };
-    PIXI.Matrix.prototype.apply = function(pos, newPos) {
-        newPos = newPos || new PIXI.Point();
+    JC.Matrix.prototype.apply = function(pos, newPos) {
+        newPos = newPos || new JC.Point();
 
         newPos.x = this.a * pos.x + this.c * pos.y + this.tx;
         newPos.y = this.b * pos.x + this.d * pos.y + this.ty;
 
         return newPos;
     };
-    PIXI.Matrix.prototype.applyInverse = function(pos, newPos) {
-        newPos = newPos || new PIXI.Point();
+    JC.Matrix.prototype.applyInverse = function(pos, newPos) {
+        newPos = newPos || new JC.Point();
 
         var id = 1 / (this.a * this.d + this.c * -this.b);
 
@@ -160,13 +161,13 @@
 
         return newPos;
     };
-    PIXI.Matrix.prototype.translate = function(x, y) {
+    JC.Matrix.prototype.translate = function(x, y) {
         this.tx += x;
         this.ty += y;
 
         return this;
     };
-    PIXI.Matrix.prototype.scale = function(x, y) {
+    JC.Matrix.prototype.scale = function(x, y) {
         this.a *= x;
         this.d *= y;
         this.c *= x;
@@ -176,7 +177,7 @@
 
         return this;
     };
-    PIXI.Matrix.prototype.rotate = function(angle) {
+    JC.Matrix.prototype.rotate = function(angle) {
         var cos = Math.cos(angle);
         var sin = Math.sin(angle);
 
@@ -193,7 +194,7 @@
 
         return this;
     };
-    PIXI.Matrix.prototype.append = function(matrix) {
+    JC.Matrix.prototype.append = function(matrix) {
         var a1 = this.a;
         var b1 = this.b;
         var c1 = this.c;
@@ -209,7 +210,7 @@
 
         return this;
     };
-    PIXI.Matrix.prototype.identity = function() {
+    JC.Matrix.prototype.identity = function() {
         this.a = 1;
         this.b = 0;
         this.c = 0;
@@ -220,36 +221,102 @@
         return this;
     };
 
-    PIXI.identityMatrix = new PIXI.Matrix();
+    JC.identityMatrix = new JC.Matrix();
 
 
+    function Animate(){
+        this.MST = 0;
+        this.MAT = 300;
+        this.fx = 'easeBoth';
+        this.complete = function(){};
+        this.moving = false;
+        this.infinity = false;
+        this.alternate = false;
+        this.repeats = 0;
+    }
+    Animate.prototype.moveTween = function(opts){
+        this.MST = Date.now();
+        this.MATR = opts.attr||this.MATR;
+        this.MAT = opts.time||this.MAT;
+        this.fx = opts.fx||this.fx;
+        this.complete = opts.complete||this.complete;
+        this.infinity = opts.infinity||this.infinity;
+        this.alternate = opts.alternate||this.alternate;
+        this.repeats = opts.repeats||this.repeats;
+        this.moving = true;
+        this.MATRC = {};
+        for(var i in this.MATR){
+            this.MATRC[i] = this[i];
+        }
+    };
+    Animate.prototype.manager = function(){
+        if(!this.moving)return;
+        var now = Date.now();
+        if(now < this.MST+this.MAT){
+            this.nextPose();
+        }else{
+            this.setVal(this.MATR);
+            if(this.repeats>0||this.infinity){
+                this.repeats>0&&--this.repeats;
+                if(this.alternate){
+                    this.moveTween({attr: this.MATRC});
+                }else{
+                    this.setVal(this.MATRC);
+                    this.moveTween({attr: this.MATR});
+                }
+            }else{
+                this.moving = false;
+                this.complete();
+                if(now>this.MST)this.complete = function(){};
+            }
+        }
+    };
+    Animate.prototype.nextPose = function(){
+        var now=Date.now()-this.MST;
+        for(var i in this.MATR){
+            this[i] = JC.TWEEN[this.fx]( now , this.MATRC[i] , this.MATR[i] - this.MATRC[i] , this.MAT );
+        }
+    };
 
-    PIXI.DisplayObject = function() {
-        this.position = new PIXI.Point();
-        this.scale = new PIXI.Point(1, 1);
-        this.pivot = new PIXI.Point();
-        this.rotation = 0;
-        this.alpha = 1;
+    JC.DisplayObject = function() {
+        Animate.call( this );
         this.visible = true;
-        // this.hitArea = null;
-        this.renderable = false;
-        this.parent = null;
-        // this.stage = null;
         this.worldAlpha = 1;
-        this.worldTransform = new PIXI.Matrix();
+        this.alpha = 1;
+
+        this.scaleX = 1;
+        this.scaleY = 1;
+
+        this.skewX = 0;
+        this.skewY = 0;
+
+        this.rotation = 0;
+        this.rotationCache = 0;
         this._sr = 0;
         this._cr = 1;
+        
+        this.x = 0;
+        this.y = 0;
+        
+        this.pivotX = 0;
+        this.pivotY = 0;
 
         this._mask = null;
+
+        this.parent = null;
+        this.worldTransform = new JC.Matrix();
+
+        this.renderable = false;
 
         this._cacheAsBitmap = false;
 
         this._cacheIsDirty = false;
     };
 
-    PIXI.DisplayObject.prototype.constructor = PIXI.DisplayObject;
+    JC.DisplayObject.prototype = Object.create( Animate.prototype );
+    JC.DisplayObject.prototype.constructor = JC.DisplayObject;
 
-    // Object.defineProperty(PIXI.DisplayObject.prototype, 'worldVisible', {
+    // Object.defineProperty(JC.DisplayObject.prototype, 'worldVisible', {
     //     get: function() {
     //         var item = this;
 
@@ -263,7 +330,7 @@
     //     }
     // });
 
-    Object.defineProperty(PIXI.DisplayObject.prototype, 'mask', {
+    Object.defineProperty(JC.DisplayObject.prototype, 'mask', {
         get: function() {
             return this._mask;
         },
@@ -275,7 +342,7 @@
         }
     });
 
-    Object.defineProperty(PIXI.DisplayObject.prototype, 'cacheAsBitmap', {
+    Object.defineProperty(JC.DisplayObject.prototype, 'cacheAsBitmap', {
 
         get: function() {
             return this._cacheAsBitmap;
@@ -295,29 +362,40 @@
         }
     });
 
-    PIXI.DisplayObject.prototype.updateTransform = function() {
+    JC.DisplayObject.prototype.setVal = function(vals){
+        if(vals===undefined)return;
+        for(var key in vals){
+            if(this[key]===undefined){
+                continue;
+            }else{
+                this[key] = vals[key];
+            }
+        }
+    };
+
+    JC.DisplayObject.prototype.updateTransform = function() {
         var pt = this.parent.worldTransform;
         var wt = this.worldTransform;
 
         var a, b, c, d, tx, ty;
 
-        if (this.rotation % PIXI.PI_2) {
+        if (this.rotation % JC.PI_2) {
             if (this.rotation !== this.rotationCache) {
                 this.rotationCache = this.rotation;
                 this._sr = Math.sin(this.rotation);
                 this._cr = Math.cos(this.rotation);
             }
 
-            a = this._cr * this.scale.x;
-            b = this._sr * this.scale.x;
-            c = -this._sr * this.scale.y;
-            d = this._cr * this.scale.y;
-            tx = this.position.x;
-            ty = this.position.y;
+            a = this._cr * this.scaleX;
+            b = this._sr * this.scaleX;
+            c = -this._sr * this.scaleY;
+            d = this._cr * this.scaleY;
+            tx = this.x;
+            ty = this.y;
 
-            if (this.pivot.x || this.pivot.y) {
-                tx -= this.pivot.x * a + this.pivot.y * c;
-                ty -= this.pivot.x * b + this.pivot.y * d;
+            if (this.pivotX || this.pivotY) {
+                tx -= this.pivotX * a + this.pivotY * c;
+                ty -= this.pivotX * b + this.pivotY * d;
             }
 
             wt.a = a * pt.a + b * pt.c;
@@ -329,11 +407,11 @@
 
 
         } else {
-            a = this.scale.x;
-            d = this.scale.y;
+            a = this.scaleX;
+            d = this.scaleY;
 
-            tx = this.position.x - this.pivot.x * a;
-            ty = this.position.y - this.pivot.y * d;
+            tx = this.x - this.pivotX * a;
+            ty = this.y - this.pivotY * d;
 
             wt.a = a * pt.a;
             wt.b = a * pt.b;
@@ -344,49 +422,51 @@
         }
 
         this.worldAlpha = this.alpha * this.parent.worldAlpha;
+
+        this.manager();
     };
 
-    PIXI.DisplayObject.prototype.displayObjectUpdateTransform = PIXI.DisplayObject.prototype.updateTransform;
+    JC.DisplayObject.prototype.displayObjectUpdateTransform = JC.DisplayObject.prototype.updateTransform;
 
-    PIXI.DisplayObject.prototype.getBounds = function(matrix) {
+    JC.DisplayObject.prototype.getBounds = function(matrix) {
         matrix = matrix; //just to get passed js hinting (and preserve inheritance)
-        return PIXI.EmptyRectangle;
+        return JC.EmptyRectangle;
     };
 
-    PIXI.DisplayObject.prototype.getLocalBounds = function() {
-        return this.getBounds(PIXI.identityMatrix);
+    JC.DisplayObject.prototype.getLocalBounds = function() {
+        return this.getBounds(JC.identityMatrix);
     };
 
-    PIXI.DisplayObject.prototype.generateTexture = function(resolution, scaleMode, renderer) {
+    JC.DisplayObject.prototype.generateTexture = function(resolution, scaleMode, renderer) {
         var bounds = this.getLocalBounds();
 
-        var renderTexture = new PIXI.RenderTexture(bounds.width | 0, bounds.height | 0, renderer, scaleMode, resolution);
+        var renderTexture = new JC.RenderTexture(bounds.width | 0, bounds.height | 0, renderer, scaleMode, resolution);
 
-        PIXI.DisplayObject._tempMatrix.tx = -bounds.x;
-        PIXI.DisplayObject._tempMatrix.ty = -bounds.y;
+        JC.DisplayObject._tempMatrix.tx = -bounds.x;
+        JC.DisplayObject._tempMatrix.ty = -bounds.y;
 
-        renderTexture.render(this, PIXI.DisplayObject._tempMatrix);
+        renderTexture.render(this, JC.DisplayObject._tempMatrix);
 
         return renderTexture;
     };
 
-    PIXI.DisplayObject.prototype.updateCache = function() {
+    JC.DisplayObject.prototype.updateCache = function() {
         this._generateCachedSprite();
     };
 
-    PIXI.DisplayObject.prototype._renderCachedSprite = function(renderSession) {
+    JC.DisplayObject.prototype._renderCachedSprite = function(renderSession) {
         this._cachedSprite.worldAlpha = this.worldAlpha;
 
-        if (renderSession.gl) PIXI.Sprite.prototype.render.call(this._cachedSprite, renderSession);
+        if (renderSession.gl) JC.Sprite.prototype.render.call(this._cachedSprite, renderSession);
     };
 
-    PIXI.DisplayObject.prototype._generateCachedSprite = function() {
+    JC.DisplayObject.prototype._generateCachedSprite = function() {
         this._cacheAsBitmap = false;
         var bounds = this.getLocalBounds();
 
         if (!this._cachedSprite) {
-            var renderTexture = new PIXI.RenderTexture(bounds.width | 0, bounds.height | 0);
-            this._cachedSprite = new PIXI.Sprite(renderTexture);
+            var renderTexture = new JC.RenderTexture(bounds.width | 0, bounds.height | 0);
+            this._cachedSprite = new JC.Sprite(renderTexture);
             this._cachedSprite.worldTransform = this.worldTransform;
         } else {
             this._cachedSprite.texture.resize(bounds.width | 0, bounds.height | 0);
@@ -395,7 +475,7 @@
         this._cacheAsBitmap = true;
     };
 
-    PIXI.DisplayObject.prototype._destroyCachedSprite = function() {
+    JC.DisplayObject.prototype._destroyCachedSprite = function() {
         if (!this._cachedSprite) return;
 
         this._cachedSprite.texture.destroy(true);
@@ -403,84 +483,84 @@
         this._cachedSprite = null;
     };
 
-    PIXI.DisplayObject.prototype.render = function(renderSession) {
+    JC.DisplayObject.prototype.render = function(renderSession) {
         // OVERWRITE;
         // this line is just here to pass jshinting :)
         renderSession = renderSession;
     };
 
-    PIXI.DisplayObject._tempMatrix = new PIXI.Matrix();
+    JC.DisplayObject._tempMatrix = new JC.Matrix();
 
-    Object.defineProperty(PIXI.DisplayObject.prototype, 'x', {
-        get: function() {
-            return this.position.x;
-        },
-        set: function(value) {
-            this.position.x = value;
-        }
-    });
+    // Object.defineProperty(JC.DisplayObject.prototype, 'x', {
+    //     get: function() {
+    //         return this.position.x;
+    //     },
+    //     set: function(value) {
+    //         this.position.x = value;
+    //     }
+    // });
 
-    Object.defineProperty(PIXI.DisplayObject.prototype, 'y', {
-        get: function() {
-            return this.position.y;
-        },
-        set: function(value) {
-            this.position.y = value;
-        }
-    });
+    // Object.defineProperty(JC.DisplayObject.prototype, 'y', {
+    //     get: function() {
+    //         return this.position.y;
+    //     },
+    //     set: function(value) {
+    //         this.position.y = value;
+    //     }
+    // });
 
 
 
-    PIXI.DisplayObjectContainer = function() {
-        PIXI.DisplayObject.call(this);
+    JC.DisplayObjectContainer = function() {
+        JC.DisplayObject.call(this);
 
         this.children = [];
     };
 
-    PIXI.DisplayObjectContainer.prototype = Object.create(PIXI.DisplayObject.prototype);
-    PIXI.DisplayObjectContainer.prototype.constructor = PIXI.DisplayObjectContainer;
+    JC.DisplayObjectContainer.prototype = Object.create(JC.DisplayObject.prototype);
+    JC.DisplayObjectContainer.prototype.constructor = JC.DisplayObjectContainer;
 
-    Object.defineProperty(PIXI.DisplayObjectContainer.prototype, 'width', {
-        get: function() {
-            return this.scale.x * this.getLocalBounds().width;
-        },
-        set: function(value) {
+    // Object.defineProperty(JC.DisplayObjectContainer.prototype, 'width', {
+    //     get: function() {
+    //         return this.scale.x * this.getLocalBounds().width;
+    //     },
+    //     set: function(value) {
 
-            var width = this.getLocalBounds().width;
+    //         var width = this.getLocalBounds().width;
 
-            if (width !== 0) {
-                this.scale.x = value / width;
-            } else {
-                this.scale.x = 1;
-            }
+    //         if (width !== 0) {
+    //             this.scale.x = value / width;
+    //         } else {
+    //             this.scale.x = 1;
+    //         }
 
-            this._width = value;
-        }
-    });
+    //         this._width = value;
+    //     }
+    // });
 
-    Object.defineProperty(PIXI.DisplayObjectContainer.prototype, 'height', {
-        get: function() {
-            return this.scale.y * this.getLocalBounds().height;
-        },
-        set: function(value) {
+    // Object.defineProperty(JC.DisplayObjectContainer.prototype, 'height', {
+    //     get: function() {
+    //         return this.scale.y * this.getLocalBounds().height;
+    //     },
+    //     set: function(value) {
 
-            var height = this.getLocalBounds().height;
+    //         var height = this.getLocalBounds().height;
 
-            if (height !== 0) {
-                this.scale.y = value / height;
-            } else {
-                this.scale.y = 1;
-            }
+    //         if (height !== 0) {
+    //             this.scale.y = value / height;
+    //         } else {
+    //             this.scale.y = 1;
+    //         }
 
-            this._height = value;
-        }
-    });
+    //         this._height = value;
+    //     }
+    // });
 
-    PIXI.DisplayObjectContainer.prototype.addChild = function(child) {
+    JC.DisplayObjectContainer.prototype.addChild = function(child) {
         return this.addChildAt(child, this.children.length);
     };
 
-    PIXI.DisplayObjectContainer.prototype.addChildAt = function(child, index) {
+    JC.DisplayObjectContainer.prototype.addChildAt = function(child, index) {
         if (index >= 0 && index <= this.children.length) {
             if (child.parent) {
                 child.parent.removeChild(child);
@@ -490,7 +570,7 @@
 
             this.children.splice(index, 0, child);
 
-            if (this.stage) child.setStageReference(this.stage);
+            // if (this.stage) child.setStageReference(this.stage);
 
             return child;
         } else {
@@ -498,7 +578,7 @@
         }
     };
 
-    PIXI.DisplayObjectContainer.prototype.swapChildren = function(child, child2) {
+    JC.DisplayObjectContainer.prototype.swapChildren = function(child, child2) {
         if (child === child2) {
             return;
         }
@@ -515,7 +595,7 @@
 
     };
 
-    PIXI.DisplayObjectContainer.prototype.getChildIndex = function(child) {
+    JC.DisplayObjectContainer.prototype.getChildIndex = function(child) {
         var index = this.children.indexOf(child);
         if (index === -1) {
             throw new Error('The supplied DisplayObject must be a child of the caller');
@@ -523,7 +603,7 @@
         return index;
     };
 
-    PIXI.DisplayObjectContainer.prototype.setChildIndex = function(child, index) {
+    JC.DisplayObjectContainer.prototype.setChildIndex = function(child, index) {
         if (index < 0 || index >= this.children.length) {
             throw new Error('The supplied index is out of bounds');
         }
@@ -532,7 +612,7 @@
         this.children.splice(index, 0, child); //add at new position
     };
 
-    PIXI.DisplayObjectContainer.prototype.getChildAt = function(index) {
+    JC.DisplayObjectContainer.prototype.getChildAt = function(index) {
         if (index < 0 || index >= this.children.length) {
             throw new Error('getChildAt: Supplied index ' + index + ' does not exist in the child list, or the supplied DisplayObject must be a child of the caller');
         }
@@ -540,14 +620,14 @@
 
     };
 
-    PIXI.DisplayObjectContainer.prototype.removeChild = function(child) {
+    JC.DisplayObjectContainer.prototype.removeChild = function(child) {
         var index = this.children.indexOf(child);
         if (index === -1) return;
 
         return this.removeChildAt(index);
     };
 
-    PIXI.DisplayObjectContainer.prototype.removeChildAt = function(index) {
+    JC.DisplayObjectContainer.prototype.removeChildAt = function(index) {
         var child = this.getChildAt(index);
         if (this.stage)
             child.removeStageReference();
@@ -557,7 +637,7 @@
         return child;
     };
 
-    PIXI.DisplayObjectContainer.prototype.removeChildren = function(beginIndex, endIndex) {
+    JC.DisplayObjectContainer.prototype.removeChildren = function(beginIndex, endIndex) {
         var begin = beginIndex || 0;
         var end = typeof endIndex === 'number' ? endIndex : this.children.length;
         var range = end - begin;
@@ -578,7 +658,7 @@
         }
     };
 
-    PIXI.DisplayObjectContainer.prototype.updateTransform = function() {
+    JC.DisplayObjectContainer.prototype.updateTransform = function() {
         if (!this.visible) return;
 
         this.displayObjectUpdateTransform();
@@ -588,9 +668,9 @@
         }
     };
 
-    PIXI.DisplayObjectContainer.prototype.displayObjectContainerUpdateTransform = PIXI.DisplayObjectContainer.prototype.updateTransform;
+    JC.DisplayObjectContainer.prototype.displayObjectContainerUpdateTransform = JC.DisplayObjectContainer.prototype.updateTransform;
 
-    PIXI.DisplayObjectContainer.prototype.render = function(renderSession) {
+    JC.DisplayObjectContainer.prototype.render = function(renderSession) {
         if (!this.visible || this.alpha <= 0) return;
 
         if (this._cacheAsBitmap) {
@@ -624,70 +704,133 @@
 
 
 
-    PIXI.Sprite = function(texture) {
-        PIXI.DisplayObjectContainer.call(this);
+    JC.Sprite = function(opts) { // opts
+        JC.DisplayObjectContainer.call(this);
 
-        this.anchor = new PIXI.Point();
+        // this.anchor = new JC.Point();
 
-        this.texture = texture || PIXI.Texture.emptyTexture;
+        this.texture = opts.texture;
 
-        this._width = 0;
+        this.width = opts.width||this.texture.width;
 
-        this._height = 0;
+        this.height = opts.height||this.texture.height;
+
+        this.sH = opts.sH||0;
+
+        this.sW = opts.sW||0;
 
         this.tint = 0xFFFFFF;
 
-        this.blendMode = PIXI.blendModes.NORMAL;
+        this.blendMode = JC.blendModes.NORMAL;
 
         this.shader = null;
 
-        if (this.texture.baseTexture.hasLoaded) {
-            this.onTextureUpdate();
-        } else {
-            this.texture.on('update', this.onTextureUpdate.bind(this));
-        }
+        this.repeatX = opts.repeatX||false;
+        this.repeatY = opts.repeatY||false;
 
         this.renderable = true;
 
+        this.buildMesh();
+
     };
 
-    PIXI.Sprite.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
-    PIXI.Sprite.prototype.constructor = PIXI.Sprite;
+    JC.Sprite.prototype = Object.create(JC.DisplayObjectContainer.prototype);
+    JC.Sprite.prototype.constructor = JC.Sprite;
 
-    Object.defineProperty(PIXI.Sprite.prototype, 'width', {
-        get: function() {
-            return this.scale.x * this.texture.frame.width;
-        },
-        set: function(value) {
-            this.scale.x = value / this.texture.frame.width;
-            this._width = value;
+
+    JC.Sprite.prototype.buildMesh = function() {
+        var w = this.texture.width,
+            h = this.texture.height;
+        this.vertices = new JC.Float32Array([
+                -this.width/2,this.height/2,
+                -this.width/2,-this.height/2,
+                this.width/2,-this.height/2,
+                this.width/2,this.height/2
+            ]);
+        this.indices = new JC.Uint16Array([
+                0,1,2,
+                0,2,3
+            ]);
+        if(this.repeatX || this.repeatY){
+            var rX = this.repeatX?2:1,
+                rY = this.repeatY?2:1;
+            this.uvs = new JC.Float32Array([
+                0*rX, 0*rY,
+                0*rX, 1*rY,
+                1*rX, 1*rY,
+                1*rX, 0*rY
+            ]);
+        }else{
+            this.uvs = new JC.Float32Array([
+                this.sW/w, this.sH/h,
+                this.sW/w, (this.sH+this.height)/h,
+                (this.sW+this.width)/w, (this.sH+this.height)/h,
+                (this.sW+this.width)/w, this.sH/h
+            ]);
         }
-    });
+        this.cachedTint = this.tint||0xFFFFFF;
+        this.dirty = true;
+    };
+    
+    JC.Sprite.prototype.createBuffer = function(gl){
+        this.vertexBuffer = gl.createBuffer();
+        this.uvsBuffer = gl.createBuffer();
+        this.indicesBuffer = gl.createBuffer();
 
-    Object.defineProperty(PIXI.Sprite.prototype, 'height', {
-        get: function() {
-            return this.scale.y * this.texture.frame.height;
-        },
-        set: function(value) {
-            this.scale.y = value / this.texture.frame.height;
-            this._height = value;
-        }
-    });
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.DYNAMIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-    PIXI.Sprite.prototype.setTexture = function(texture) {
-        this.texture = texture;
-        this.cachedTint = 0xFFFFFF;
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.uvsBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, this.uvs, gl.DYNAMIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+
+        this.dirty = false;
     };
 
-    PIXI.Sprite.prototype.onTextureUpdate = function() {
-        if (this._width) this.scale.x = this._width / this.texture.frame.width;
-        if (this._height) this.scale.y = this._height / this.texture.frame.height;
+    JC.Sprite.prototype.syncUniforms = function(renderSession){
+        var gl = renderSession.gl,
+            shader = renderSession.shaderManager.shader,
+            projection = renderSession.projection;
+
+        gl.uniform1i(shader.uSampler, 0);
+        gl.uniform1f(shader.uAlpha, this.worldAlpha);
+        gl.uniform2f(shader.projectionVector, projection.x, projection.y);
+        gl.uniformMatrix3fv(shader.uMatrix, false, this.worldTransform.toArray(true));
+        gl.uniform3fv(shader.uTint, JC.hex2rgb(this.tint));
+
     };
 
-    PIXI.Sprite.prototype.render = function(renderSession) {
+    JC.Sprite.prototype.syncAttribute = function(renderSession){
+        var gl = renderSession.gl,
+            shader = renderSession.shaderManager.shader;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+        gl.enableVertexAttribArray(shader.aVertexPosition);
+        gl.vertexAttribPointer(shader.aVertexPosition, 2, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.uvsBuffer);
+        gl.enableVertexAttribArray(shader.aTextureCoord);
+        gl.vertexAttribPointer(shader.aTextureCoord, 2, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
+    };
+
+    JC.Sprite.prototype.upDate = function(renderSession) {
+        renderSession.texturesManager.setTexture(this.texture);
+        this.dirty&&this.createBuffer(renderSession.gl);
+        this.syncAttribute(renderSession);
+        this.syncUniforms(renderSession);
+    };
+
+    JC.Sprite.prototype.render = function(renderSession) {
         if (!this.visible || this.alpha <= 0) return;
-
-        var i, j;
+        this.upDate(renderSession);
+        var i, j, gl = renderSession.gl;
 
         // do a quick check to see if this element has a mask or a filter.
         if (this._mask) {
@@ -697,7 +840,7 @@
             }
 
             // add this sprite to the batch
-            renderSession.spriteBatch.render(this);
+            gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
 
             // now loop through the children and make sure they get rendered
             for (i = 0, j = this.children.length; i < j; i++) {
@@ -708,7 +851,8 @@
 
             if (this._mask) renderSession.maskManager.popMask(this._mask, renderSession);
         } else {
-            renderSession.spriteBatch.render(this);
+
+            gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
 
             // simple render children!
             for (i = 0, j = this.children.length; i < j; i++) {
@@ -718,24 +862,24 @@
         }
     };
 
-    PIXI.Sprite.fromFrame = function(frameId) {
-        var texture = PIXI.TextureCache[frameId];
+    JC.Sprite.fromFrame = function(frameId) {
+        var texture = JC.TextureCache[frameId];
         if (!texture) throw new Error('The frameId "' + frameId + '" does not exist in the texture cache' + this);
-        return new PIXI.Sprite(texture);
+        return new JC.Sprite(texture);
     };
 
-    PIXI.Sprite.fromImage = function(imageId, crossorigin, scaleMode) {
-        var texture = PIXI.Texture.fromImage(imageId, crossorigin, scaleMode);
-        return new PIXI.Sprite(texture);
+    JC.Sprite.fromImage = function(imageId, crossorigin, scaleMode) {
+        var texture = JC.Texture.fromImage(imageId, crossorigin, scaleMode);
+        return new JC.Sprite(texture);
     };
 
 
 
 
-    PIXI.Stage = function(backgroundColor) {
-        PIXI.DisplayObjectContainer.call(this);
+    JC.Stage = function(backgroundColor) {
+        JC.DisplayObjectContainer.call(this);
 
-        this.worldTransform = new PIXI.Matrix();
+        this.worldTransform = new JC.Matrix();
 
         this.interactive = true;
 
@@ -746,10 +890,10 @@
         this.setBackgroundColor(backgroundColor);
     };
 
-    PIXI.Stage.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
-    PIXI.Stage.prototype.constructor = PIXI.Stage;
+    JC.Stage.prototype = Object.create(JC.DisplayObjectContainer.prototype);
+    JC.Stage.prototype.constructor = JC.Stage;
 
-    PIXI.Stage.prototype.updateTransform = function() {
+    JC.Stage.prototype.updateTransform = function() {
         this.worldAlpha = 1;
 
         for (var i = 0, j = this.children.length; i < j; i++) {
@@ -757,18 +901,18 @@
         }
     };
 
-    PIXI.Stage.prototype.setBackgroundColor = function(bgc) {
+    JC.Stage.prototype.setBackgroundColor = function(bgc) {
         if (typeof bgc === 'number') return;
-        this.backgroundColor = PIXI.hex2rgb(bgc);
+        this.backgroundColor = JC.hex2rgb(bgc);
     };
 
 
 
-    PIXI.hex2rgb = function(hex) {
+    JC.hex2rgb = function(hex) {
         return [(hex >> 16 & 0xFF) / 255, (hex >> 8 & 0xFF) / 255, (hex & 0xFF) / 255];
     };
 
-    PIXI.rgb2hex = function(rgb) {
+    JC.rgb2hex = function(rgb) {
         return ((rgb[0] * 255 << 16) + (rgb[1] * 255 << 8) + rgb[2] * 255);
     };
 
@@ -808,7 +952,7 @@
         })();
     }
 
-    PIXI.getNextPowerOfTwo = function(number) {
+    JC.getNextPowerOfTwo = function(number) {
         if (number > 0 && (number & (number - 1)) === 0) // see: http://goo.gl/D9kPj
             return number;
         else {
@@ -818,22 +962,22 @@
         }
     };
 
-    PIXI.isPowerOfTwo = function(width, height) {
+    JC.isPowerOfTwo = function(width, height) {
         return (width > 0 && (width & (width - 1)) === 0 && height > 0 && (height & (height - 1)) === 0);
 
     };
 
 
 
-    PIXI.CompileVertexShader = function(gl, shaderSrc) {
-        return PIXI._CompileShader(gl, shaderSrc, gl.VERTEX_SHADER);
+    JC.CompileVertexShader = function(gl, shaderSrc) {
+        return JC._CompileShader(gl, shaderSrc, gl.VERTEX_SHADER);
     };
 
-    PIXI.CompileFragmentShader = function(gl, shaderSrc) {
-        return PIXI._CompileShader(gl, shaderSrc, gl.FRAGMENT_SHADER);
+    JC.CompileFragmentShader = function(gl, shaderSrc) {
+        return JC._CompileShader(gl, shaderSrc, gl.FRAGMENT_SHADER);
     };
 
-    PIXI._CompileShader = function(gl, shaderSrc, shaderType) {
+    JC._CompileShader = function(gl, shaderSrc, shaderType) {
         var src = shaderSrc.join("\n");
         var shader = gl.createShader(shaderType);
         gl.shaderSource(shader, src);
@@ -847,9 +991,9 @@
         return shader;
     };
 
-    PIXI.compileProgram = function(gl, vertexSrc, fragmentSrc) {
-        var fragmentShader = PIXI.CompileFragmentShader(gl, fragmentSrc);
-        var vertexShader = PIXI.CompileVertexShader(gl, vertexSrc);
+    JC.compileProgram = function(gl, vertexSrc, fragmentSrc) {
+        var fragmentShader = JC.CompileFragmentShader(gl, fragmentSrc);
+        var vertexShader = JC.CompileVertexShader(gl, vertexSrc);
 
         var shaderProgram = gl.createProgram();
 
@@ -866,8 +1010,8 @@
 
 
 
-    PIXI.SpriteShader = function(gl) {
-        this._UID = PIXI._UID++;
+    JC.SpriteShader = function(gl) {
+        this._UID = JC._UID++;
 
         this.gl = gl;
 
@@ -876,40 +1020,30 @@
         this.fragmentSrc = [
             'precision lowp float;',
             'varying vec2 vTextureCoord;',
-            'varying float vColor;',
+
             'uniform sampler2D uSampler;',
+            'uniform vec3 uTint;',
+            'uniform float uAlpha;',
+
             'void main(void) {',
-            '   gl_FragColor = texture2D(uSampler, vTextureCoord) * vColor ;',
+            '   vec4 smpColor = texture2D(uSampler, vTextureCoord);',
+            '   gl_FragColor = vec4(uTint,uAlpha) * smpColor;',
             '}'
         ];
 
         this.vertexSrc = [
             'attribute vec2 aVertexPosition;',
-            'attribute vec2 aPositionCoord;',
-            'attribute vec2 aScale;',
-            'attribute float aRotation;',
             'attribute vec2 aTextureCoord;',
-            'attribute float aColor;',
 
             'uniform vec2 projectionVector;',
-            'uniform vec2 offsetVector;',
             'uniform mat3 uMatrix;',
 
             'varying vec2 vTextureCoord;',
-            'varying float vColor;',
-
-            'const vec2 center = vec2(-1.0, 1.0);',
 
             'void main(void) {',
-            '   vec2 v;',
-            '   vec2 sv = aVertexPosition * aScale;',
-            '   v.x = (sv.x) * cos(aRotation) - (sv.y) * sin(aRotation);',
-            '   v.y = (sv.x) * sin(aRotation) + (sv.y) * cos(aRotation);',
-            '   v = ( uMatrix * vec3(v + aPositionCoord , 1.0) ).xy ;',
-            '   gl_Position = vec4( ( v / projectionVector) + center , 0.0, 1.0);',
+            '   vec2 v = ( uMatrix * vec3(aVertexPosition , 1.0) ).xy ;',
+            '   gl_Position = vec4( v / projectionVector , 0.0, 1.0);',
             '   vTextureCoord = aTextureCoord;',
-            //  '   vec3 color = mod(vec3(aColor.y/65536.0, aColor.y/256.0, aColor.y), 256.0) / 256.0;',
-            '   vColor = aColor;',
             '}'
         ];
 
@@ -918,64 +1052,49 @@
         this.init();
     };
 
-    PIXI.SpriteShader.prototype.constructor = PIXI.SpriteShader;
+    JC.SpriteShader.prototype.constructor = JC.SpriteShader;
 
-    PIXI.SpriteShader.prototype.init = function() {
+    JC.SpriteShader.prototype.init = function() {
         var gl = this.gl;
 
-        var program = PIXI.compileProgram(gl, this.vertexSrc, this.fragmentSrc);
+        var program = JC.compileProgram(gl, this.vertexSrc, this.fragmentSrc);
 
         gl.useProgram(program);
 
         this.uSampler = gl.getUniformLocation(program, 'uSampler');
-
         this.projectionVector = gl.getUniformLocation(program, 'projectionVector');
-        this.offsetVector = gl.getUniformLocation(program, 'offsetVector');
-        this.dimensions = gl.getUniformLocation(program, 'dimensions');
         this.uMatrix = gl.getUniformLocation(program, 'uMatrix');
+        this.uTint = gl.getUniformLocation(program, 'uTint');
+        this.uAlpha = gl.getUniformLocation(program, 'uAlpha');
 
         this.aVertexPosition = gl.getAttribLocation(program, 'aVertexPosition');
-        this.aPositionCoord = gl.getAttribLocation(program, 'aPositionCoord');
-
-        this.aScale = gl.getAttribLocation(program, 'aScale');
-        this.aRotation = gl.getAttribLocation(program, 'aRotation');
-
         this.aTextureCoord = gl.getAttribLocation(program, 'aTextureCoord');
-        this.colorAttribute = gl.getAttribLocation(program, 'aColor');
 
-
-
-        if (this.colorAttribute === -1) {
-            this.colorAttribute = 2;
-        }
-
-        this.attributes = [this.aVertexPosition, this.aPositionCoord, this.aScale, this.aRotation, this.aTextureCoord, this.colorAttribute];
-
-        // End worst hack eva //
+        // this.attributes = [this.aVertexPosition, this.aPositionCoord];
 
         this.program = program;
     };
 
-    PIXI.SpriteShader.prototype.destroy = function() {
+    JC.SpriteShader.prototype.destroy = function() {
         this.gl.deleteProgram(this.program);
         this.uniforms = null;
         this.gl = null;
 
-        this.attributes = null;
+        // this.attributes = null;
     };
 
 
 
-    PIXI.WebGLRenderer = function(width, height, options) {
+    JC.Renderer = function(width, height, options) {
         if (options) {
-            for (var i in PIXI.defaultRenderOptions) {
-                if (typeof options[i] === 'undefined') options[i] = PIXI.defaultRenderOptions[i];
+            for (var i in JC.defaultRenderOptions) {
+                if (typeof options[i] === 'undefined') options[i] = JC.defaultRenderOptions[i];
             }
         } else {
-            options = PIXI.defaultRenderOptions;
+            options = JC.defaultRenderOptions;
         }
 
-        // PIXI.sayHello('webGL');
+        // JC.sayHello('webGL');
 
         this.resolution = options.resolution || window.devicePixelRatio;
 
@@ -1006,21 +1125,24 @@
             preserveDrawingBuffer: options.preserveDrawingBuffer
         };
 
-        this.projection = new PIXI.Point();
+        this.projection = new JC.Point();
 
-        this.offset = new PIXI.Point(0, 0);
+        this.offset = new JC.Point(0, 0);
 
-        this.shaderManager = new PIXI.WebGLShaderManager();
+        this.shaderManager = new JC.ShaderManager();
 
-        this.maskManager = new PIXI.WebGLMaskManager();
+        this.texturesManager = new JC.TexturesManager();
 
-        // this.stencilManager = new PIXI.WebGLStencilManager();
+        this.maskManager = new JC.WebGLMaskManager();
 
-        this.blendModeManager = new PIXI.WebGLBlendModeManager();
+        // this.stencilManager = new JC.WebGLStencilManager();
+
+        this.blendModeManager = new JC.WebGLBlendModeManager();
 
         this.renderSession = {};
         this.renderSession.gl = this.gl;
         this.renderSession.shaderManager = this.shaderManager;
+        this.renderSession.texturesManager = this.texturesManager;
         this.renderSession.maskManager = this.maskManager;
         this.renderSession.blendModeManager = this.blendModeManager;
         // this.renderSession.stencilManager = this.stencilManager;
@@ -1035,12 +1157,12 @@
     };
 
     // constructor
-    PIXI.WebGLRenderer.prototype.constructor = PIXI.WebGLRenderer;
+    JC.Renderer.prototype.constructor = JC.Renderer;
 
     /**
      * @method initContext
      */
-    PIXI.WebGLRenderer.prototype.initContext = function() {
+    JC.Renderer.prototype.initContext = function() {
         var gl = this.view.getContext('webgl', this._contextOptions) || this.view.getContext('experimental-webgl', this._contextOptions);
         this.gl = gl;
 
@@ -1049,13 +1171,14 @@
             throw new Error('This browser does not support webGL. Try using the canvas renderer');
         }
 
-        // set up the default pixi settings..
+        // set up the default JC settings..
         gl.disable(gl.DEPTH_TEST);
         gl.disable(gl.CULL_FACE);
         gl.enable(gl.BLEND);
 
         // need to set the context for all the managers...
         this.shaderManager.setContext(gl);
+        this.texturesManager.setContext(gl);
         this.maskManager.setContext(gl);
         this.blendModeManager.setContext(gl);
 
@@ -1066,7 +1189,7 @@
 
     };
 
-    PIXI.WebGLRenderer.prototype.render = function(stage) {
+    JC.Renderer.prototype.render = function(stage) {
         // no point rendering if our context has been blown up!
         if (this.contextLost) return;
 
@@ -1091,8 +1214,8 @@
         this.renderDisplayObject(stage, this.projection);
     };
 
-    PIXI.WebGLRenderer.prototype.renderDisplayObject = function(displayObject, projection, buffer) {
-        this.renderSession.blendModeManager.setBlendMode(PIXI.blendModes.NORMAL);
+    JC.Renderer.prototype.renderDisplayObject = function(displayObject, projection, buffer) {
+        this.renderSession.blendModeManager.setBlendMode(JC.blendModes.NORMAL);
 
         // set the default projection
         this.renderSession.projection = projection;
@@ -1101,16 +1224,16 @@
         this.renderSession.offset = this.offset;
 
         // start the sprite batch
-        this.spriteBatch.begin(this.renderSession);
+        // this.spriteBatch.begin(this.renderSession);
 
         // render the scene!
         displayObject.render(this.renderSession);
 
         // finish the sprite batch
-        this.spriteBatch.end();
+        // this.spriteBatch.end();
     };
 
-    PIXI.WebGLRenderer.prototype.resize = function(width, height) {
+    JC.Renderer.prototype.resize = function(width, height) {
         this.width = width * this.resolution;
         this.height = height * this.resolution;
 
@@ -1125,111 +1248,181 @@
         this.gl.viewport(0, 0, this.width, this.height);
 
         this.projection.x = this.width / 2 / this.resolution;
-        this.projection.y = -this.height / 2 / this.resolution;
+        this.projection.y = this.height / 2 / this.resolution;
     };
 
-    PIXI.WebGLRenderer.prototype.updateTexture = function(texture) {
-        if (!texture.hasLoaded) return;
-
-        var gl = this.gl;
-
-        if (!texture._glTextures[gl.id]) texture._glTextures[gl.id] = gl.createTexture();
-
-        gl.bindTexture(gl.TEXTURE_2D, texture._glTextures[gl.id]);
-
-        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultipliedAlpha);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.source);
-
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, texture.scaleMode === PIXI.scaleModes.LINEAR ? gl.LINEAR : gl.NEAREST);
-
-
-        if (texture.mipmap && PIXI.isPowerOfTwo(texture.width, texture.height)) {
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, texture.scaleMode === PIXI.scaleModes.LINEAR ? gl.LINEAR_MIPMAP_LINEAR : gl.NEAREST_MIPMAP_NEAREST);
-            gl.generateMipmap(gl.TEXTURE_2D);
-        } else {
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, texture.scaleMode === PIXI.scaleModes.LINEAR ? gl.LINEAR : gl.NEAREST);
-        }
-
-        // reguler...
-        if (!texture._powerOf2) {
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        } else {
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-        }
-
-        texture._dirty[gl.id] = false;
-
-        return texture._glTextures[gl.id];
-    };
-
-    PIXI.WebGLRenderer.prototype.handleContextLost = function(event) {
+    JC.Renderer.prototype.handleContextLost = function(event) {
         event.preventDefault();
         this.contextLost = true;
     };
 
-    PIXI.WebGLRenderer.prototype.handleContextRestored = function() {
+    JC.Renderer.prototype.handleContextRestored = function() {
         this.initContext();
 
-        for (var key in PIXI.TextureCache) {
-            var texture = PIXI.TextureCache[key].baseTexture;
+        for (var key in JC.TextureCache) {
+            var texture = JC.TextureCache[key].baseTexture;
             texture._glTextures = [];
         }
 
         this.contextLost = false;
     };
 
-    PIXI.WebGLRenderer.prototype.mapBlendModes = function() {
+    JC.Renderer.prototype.mapBlendModes = function() {
         var gl = this.gl;
 
-        if (!PIXI.blendModesWebGL) {
-            PIXI.blendModesWebGL = [];
+        if (!JC.blendModesWebGL) {
+            JC.blendModesWebGL = [];
 
-            PIXI.blendModesWebGL[PIXI.blendModes.NORMAL]      = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-            PIXI.blendModesWebGL[PIXI.blendModes.ADD]         = [gl.SRC_ALPHA, gl.DST_ALPHA];
-            PIXI.blendModesWebGL[PIXI.blendModes.MULTIPLY]    = [gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA];
-            PIXI.blendModesWebGL[PIXI.blendModes.SCREEN]      = [gl.SRC_ALPHA, gl.ONE];
+            JC.blendModesWebGL[JC.blendModes.NORMAL]      = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
+            JC.blendModesWebGL[JC.blendModes.ALPHA]      = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
+            JC.blendModesWebGL[JC.blendModes.ADD]         = [gl.SRC_ALPHA, gl.DST_ALPHA];
+            JC.blendModesWebGL[JC.blendModes.MULTIPLY]    = [gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA];
+            JC.blendModesWebGL[JC.blendModes.SCREEN]      = [gl.SRC_ALPHA, gl.ONE];
         }
     };
 
-    PIXI.WebGLBlendModeManager = function() {
-        this.currentBlendMode = 99999;
+
+
+
+
+    JC.TexturesManager = function() {
+        this.textures = {};
     };
 
-    PIXI.WebGLBlendModeManager.prototype.constructor = PIXI.WebGLBlendModeManager;
+    JC.TexturesManager.prototype.constructor = JC.TexturesManager;
 
-    PIXI.WebGLBlendModeManager.prototype.setContext = function(gl) {
+    JC.TexturesManager.prototype.setContext = function(gl) {
         this.gl = gl;
+        // this.MAX_UNITS = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
+        this._UNITS = 0;
     };
 
-    PIXI.WebGLBlendModeManager.prototype.setBlendMode = function(blendMode) {
-        if (this.currentBlendMode === blendMode) return false;
+    JC.TexturesManager.prototype.setTexture = function(texture) {
+        var gl = this.gl;
+        if (this.currentId === texture.id) return false;
 
-        this.currentBlendMode = blendMode;
+        if(this.textures[texture.id]===undefined){
+            this.setPara(texture);
+        }
 
-        var blendModeWebGL = PIXI.blendModesWebGL[this.currentBlendMode];
-        this.gl.blendFunc(blendModeWebGL[0], blendModeWebGL[1]);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.textures[texture.id].texture);
+        
+        this.currentId = texture.id;
 
         return true;
     };
 
-    PIXI.WebGLBlendModeManager.prototype.destroy = function() {
+    JC.TexturesManager.prototype.setPara = function(texture) {
+        var gl = this.gl;
+
+        texture.texture = gl.createTexture();
+
+        // gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+        
+        gl.bindTexture(gl.TEXTURE_2D, texture.texture);
+        
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.img);
+        
+        // gl.generateMipmap(gl.TEXTURE_2D);
+
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+        
+        texture.unit = this._UNITS;
+
+        this.textures[texture.id] = texture;
+
+        gl.bindTexture(gl.TEXTURE_2D, null);
+
+        this._UNITS++;
+    };
+
+    JC.TexturesManager.prototype.destroy = function() {
         this.gl = null;
     };
 
 
 
 
-    PIXI.WebGLMaskManager = function() {};
+    JC.WebGLBlendModeManager = function() {
+        this.currentBlendMode = 99999;
+    };
 
-    PIXI.WebGLMaskManager.prototype.constructor = PIXI.WebGLMaskManager;
+    JC.WebGLBlendModeManager.prototype.constructor = JC.WebGLBlendModeManager;
 
-    PIXI.WebGLMaskManager.prototype.setContext = function(gl) {
+    JC.WebGLBlendModeManager.prototype.setContext = function(gl) {
         this.gl = gl;
     };
 
-    PIXI.WebGLMaskManager.prototype.pushMask = function(maskData, renderSession) {
+    JC.WebGLBlendModeManager.prototype.setBlendMode = function(blendMode) {
+        if (this.currentBlendMode === blendMode) return false;
+
+        this.currentBlendMode = blendMode;
+
+        var blendModeWebGL = JC.blendModesWebGL[this.currentBlendMode];
+        this.gl.blendFunc(blendModeWebGL[0], blendModeWebGL[1]);
+
+        return true;
+    };
+
+    JC.WebGLBlendModeManager.prototype.destroy = function() {
+        this.gl = null;
+    };
+
+
+    JC.ShaderManager = function()
+    {
+
+        this.shaders = {};
+
+    };
+
+    JC.ShaderManager.prototype.constructor = JC.ShaderManager;
+
+    JC.ShaderManager.prototype.setContext = function(gl)
+    {
+        this.gl = gl;
+
+        // this shader is used for the default sprite rendering
+        this.shaders['sprite'] = new JC.SpriteShader(gl);
+
+        this.setShader('sprite');
+    };
+
+
+    JC.ShaderManager.prototype.setShader = function(type)
+    {
+        if(this._curShaderType === type)return false;
+        
+        this._curShaderType = type;
+
+        this.shader = this.shaders[type];
+
+        this.gl.useProgram(this.shader.program);
+
+        return true;
+    };
+
+    JC.ShaderManager.prototype.destroy = function()
+    {
+        this.gl = null;
+    };
+
+
+
+
+    JC.WebGLMaskManager = function() {};
+
+    JC.WebGLMaskManager.prototype.constructor = JC.WebGLMaskManager;
+
+    JC.WebGLMaskManager.prototype.setContext = function(gl) {
+        this.gl = gl;
+    };
+
+    JC.WebGLMaskManager.prototype.pushMask = function(maskData, renderSession) {
         var gl = renderSession.gl;
 
 
@@ -1247,14 +1440,16 @@
         gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
     };
 
-    PIXI.WebGLMaskManager.prototype.popMask = function() {
+    JC.WebGLMaskManager.prototype.popMask = function() {
         var gl = this.gl;
         gl.disable(gl.STENCIL_TEST);
     };
 
-    PIXI.WebGLMaskManager.prototype.destroy = function() {
+    JC.WebGLMaskManager.prototype.destroy = function() {
         this.gl = null;
     };
+
+
 
 
     /**
@@ -1263,13 +1458,13 @@
 
     if (typeof exports !== 'undefined') {
         if (typeof module !== 'undefined' && module.exports) {
-            exports = module.exports = PIXI;
+            exports = module.exports = JC;
         }
-        exports.PIXI = PIXI;
+        exports.JC = JC;
     } else if (typeof define !== 'undefined' && define.amd) {
-        define(PIXI);
+        define(JC);
     } else {
-        root.PIXI = PIXI;
+        root.JC = JC;
     }
 
 })(this);

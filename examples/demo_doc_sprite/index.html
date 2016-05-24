@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+	<title>JC_demo</title>
+	<style type="text/css">
+    * {padding:0;margin:0;}
+    body {overflow: hidden;}
+    #demo_canvas {
+        width: 100%;
+        height: 100%;
+    }
+    </style>
+</head>
+<body>
+<canvas id="demo_canvas" width="320" height="410"></canvas>
+
+<script type="text/javascript" src="../../src/jcw2d.js"></script>
+<script type="text/javascript" src="../libs/stats.min.js"></script>
+<script type="text/javascript">
+window.onerror = function(msg,url,line){
+	alert('line::::'+line+'url::::'+url+'msg::::'+msg);
+};
+window.onresize = function(){
+    resize();
+};
+
+
+var stats = new Stats();
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.top = '0px';
+    document.body.appendChild(stats.domElement);
+
+var w = window.innerWidth,
+    h = window.innerHeight,
+    num = 100,
+    sprites=[],
+    stage = new JC.Stage(),
+    renderer = new JC.Renderer(w,h,{
+        view: document.getElementById('demo_canvas'),
+        transparent: false,
+        antialias: true,
+        preserveDrawingBuffer: false,
+        resolution: window.devicePixelRatio,
+        clearBeforeRender: true,
+        autoResize: false
+    });
+
+
+var images = new JC.ImageLoader({
+    pic: './images/texture1.png'
+}, true);
+
+images.onLoaded = function(){
+    resize();
+    var tmp = stage;
+    for(var i=0;i<num;i++){
+        sprites[i] = new JC.Sprite({
+            texture: images.getTexture('pic')
+        });
+        sprites[i].x = (Math.random()-0.5)*w;
+        sprites[i].y = (Math.random()-0.5)*h;
+
+        sprites[i].moveTween({
+            attr: {x: 0,y: 0,rotation: 720*JC.DTR},
+            infinity: true,
+            alternate: true,
+            time: 1000
+        });
+        tmp.addChild(sprites[i]);
+        tmp = sprites[i];
+    }
+
+
+    // sprites = new JC.Sprite({
+    //     texture: images.getTexture('pic')
+    // });
+    // sprites.x = (Math.random()-0.5)*w;
+    // sprites.y = (Math.random()-0.5)*h;
+
+    // sprites.moveTween({
+    //     attr: {x: 0,y: 0,rotation: 720*JC.DTR},
+    //     infinity: true,
+    //     alternate: true,
+    //     time: 1000
+    // });
+    // DOC.addChilds(pic);
+    // stage.addChild(sprites);
+
+
+    render();
+};
+
+function render(){
+    RAF(render);
+
+    renderer.render(stage);
+
+    stats.update();
+}
+function resize(){
+	w = window.innerWidth;
+	h = window.innerHeight;
+	// stage.resize(w,h);
+}
+</script>
+</body>
+</html>
