@@ -4,7 +4,7 @@
 
     var JC = JC || {};
 
-    JC.VERSION = "v0.0.5";
+    JC.VERSION = "v0.0.3";
 
     JC.blendModes = {
         NORMAL: 0,
@@ -20,8 +20,6 @@
         NEAREST: 1
     };
 
-    JC._UID = 0;
-
     if (typeof(Float32Array) != 'undefined') {
         JC.Float32Array = Float32Array;
         JC.Uint16Array = Uint16Array;
@@ -29,7 +27,12 @@
         JC.Uint32Array = Uint32Array;
         JC.ArrayBuffer = ArrayBuffer;
     } else {
-        console.log('%c not support WebGL ', 'color: #fff;background: #f00;');
+        JC.Float32Array = Array;
+        JC.Uint16Array = Array;
+
+        JC.Uint32Array = Array;
+        JC.ArrayBuffer = Array;
+        console.log('%c not type array ', 'color: #fff;background: #f00;');
     }
 
     JC.PI_2 = Math.PI * 2;
@@ -50,24 +53,24 @@
         autoResize: false
     };
 
+    function noop(){}
+
     JC.sayHello = function(type) {
         if (JC.dontSpeek) return;
 
         if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
             var args = [
-                '%c %c %c JC.js ' + JC.VERSION + ' - ' + type + '  %c ' + ' %c ' + ' http://www.JCjs.com/  %c %c ♥%c♥%c♥ ',
-                'background: #ff66a5',
-                'background: #ff66a5',
-                'color: #ff66a5; background: #030307;',
-                'background: #ff66a5',
-                'background: #ffc3dc',
-                'background: #ff66a5',
-                'color: #ff2424; background: #fff',
-                'color: #ff2424; background: #fff',
-                'color: #ff2424; background: #fff'
+                '%c  %c jcw2d.js ' + JC.VERSION + '  %c ' + ' %c ' + ' http://www.jason82.com/ %c  ',
+                'background: #80a89e',
+                'color: #f98165; background: #cad9d5;',
+                'background: #80a89e',
+                'background: #cad9d5',
+                'background: #80a89e'
             ];
 
             console.log.apply(console, args);
+        }else{
+            console.log(' jcw2d.js ' + JC.VERSION + '  http://www.jason82.com/  ');
         }
 
         JC.dontSpeek = true;
@@ -89,16 +92,6 @@
     JC.Point.prototype.constructor = JC.Point;
 
 
-    /**
-     * The Matrix class is now an object, which makes it a lot faster, 
-     * here is a representation of it : 
-     * | a | b | tx|
-     * | c | d | ty|
-     * | 0 | 0 | 1 |
-     *
-     * @class Matrix
-     * @constructor
-     */
     JC.Matrix = function() {
         this.a = 1;
         this.b = 0;
@@ -228,7 +221,7 @@
         this.MST = 0;
         this.MAT = 300;
         this.fx = 'easeBoth';
-        this.complete = function(){};
+        this.complete = noop;
         this.moving = false;
         this.infinity = false;
         this.alternate = false;
@@ -267,7 +260,7 @@
             }else{
                 this.moving = false;
                 this.complete();
-                if(now>this.MST)this.complete = function(){};
+                if(now>this.MST)this.complete = noop;
             }
         }
     };
@@ -315,20 +308,6 @@
 
     JC.DisplayObject.prototype = Object.create( Animate.prototype );
     JC.DisplayObject.prototype.constructor = JC.DisplayObject;
-
-    // Object.defineProperty(JC.DisplayObject.prototype, 'worldVisible', {
-    //     get: function() {
-    //         var item = this;
-
-    //         do {
-    //             if (!item.visible) return false;
-    //             item = item.parent;
-    //         }
-    //         while (item);
-
-    //         return true;
-    //     }
-    // });
 
     Object.defineProperty(JC.DisplayObject.prototype, 'mask', {
         get: function() {
@@ -428,86 +407,11 @@
 
     JC.DisplayObject.prototype.displayObjectUpdateTransform = JC.DisplayObject.prototype.updateTransform;
 
-    JC.DisplayObject.prototype.getBounds = function(matrix) {
-        matrix = matrix; //just to get passed js hinting (and preserve inheritance)
-        return JC.EmptyRectangle;
-    };
-
-    JC.DisplayObject.prototype.getLocalBounds = function() {
-        return this.getBounds(JC.identityMatrix);
-    };
-
-    JC.DisplayObject.prototype.generateTexture = function(resolution, scaleMode, renderer) {
-        var bounds = this.getLocalBounds();
-
-        var renderTexture = new JC.RenderTexture(bounds.width | 0, bounds.height | 0, renderer, scaleMode, resolution);
-
-        JC.DisplayObject._tempMatrix.tx = -bounds.x;
-        JC.DisplayObject._tempMatrix.ty = -bounds.y;
-
-        renderTexture.render(this, JC.DisplayObject._tempMatrix);
-
-        return renderTexture;
-    };
-
-    JC.DisplayObject.prototype.updateCache = function() {
-        this._generateCachedSprite();
-    };
-
-    JC.DisplayObject.prototype._renderCachedSprite = function(renderSession) {
-        this._cachedSprite.worldAlpha = this.worldAlpha;
-
-        if (renderSession.gl) JC.Sprite.prototype.render.call(this._cachedSprite, renderSession);
-    };
-
-    JC.DisplayObject.prototype._generateCachedSprite = function() {
-        this._cacheAsBitmap = false;
-        var bounds = this.getLocalBounds();
-
-        if (!this._cachedSprite) {
-            var renderTexture = new JC.RenderTexture(bounds.width | 0, bounds.height | 0);
-            this._cachedSprite = new JC.Sprite(renderTexture);
-            this._cachedSprite.worldTransform = this.worldTransform;
-        } else {
-            this._cachedSprite.texture.resize(bounds.width | 0, bounds.height | 0);
-        }
-
-        this._cacheAsBitmap = true;
-    };
-
-    JC.DisplayObject.prototype._destroyCachedSprite = function() {
-        if (!this._cachedSprite) return;
-
-        this._cachedSprite.texture.destroy(true);
-
-        this._cachedSprite = null;
-    };
-
     JC.DisplayObject.prototype.render = function(renderSession) {
         // OVERWRITE;
         // this line is just here to pass jshinting :)
         renderSession = renderSession;
     };
-
-    JC.DisplayObject._tempMatrix = new JC.Matrix();
-
-    // Object.defineProperty(JC.DisplayObject.prototype, 'x', {
-    //     get: function() {
-    //         return this.position.x;
-    //     },
-    //     set: function(value) {
-    //         this.position.x = value;
-    //     }
-    // });
-
-    // Object.defineProperty(JC.DisplayObject.prototype, 'y', {
-    //     get: function() {
-    //         return this.position.y;
-    //     },
-    //     set: function(value) {
-    //         this.position.y = value;
-    //     }
-    // });
 
 
 
@@ -519,42 +423,6 @@
 
     JC.DisplayObjectContainer.prototype = Object.create(JC.DisplayObject.prototype);
     JC.DisplayObjectContainer.prototype.constructor = JC.DisplayObjectContainer;
-
-    // Object.defineProperty(JC.DisplayObjectContainer.prototype, 'width', {
-    //     get: function() {
-    //         return this.scale.x * this.getLocalBounds().width;
-    //     },
-    //     set: function(value) {
-
-    //         var width = this.getLocalBounds().width;
-
-    //         if (width !== 0) {
-    //             this.scale.x = value / width;
-    //         } else {
-    //             this.scale.x = 1;
-    //         }
-
-    //         this._width = value;
-    //     }
-    // });
-
-    // Object.defineProperty(JC.DisplayObjectContainer.prototype, 'height', {
-    //     get: function() {
-    //         return this.scale.y * this.getLocalBounds().height;
-    //     },
-    //     set: function(value) {
-
-    //         var height = this.getLocalBounds().height;
-
-    //         if (height !== 0) {
-    //             this.scale.y = value / height;
-    //         } else {
-    //             this.scale.y = 1;
-    //         }
-
-    //         this._height = value;
-    //     }
-    // });
 
     JC.DisplayObjectContainer.prototype.addChild = function(child) {
         return this.addChildAt(child, this.children.length);
@@ -569,8 +437,6 @@
             child.parent = this;
 
             this.children.splice(index, 0, child);
-
-            // if (this.stage) child.setStageReference(this.stage);
 
             return child;
         } else {
@@ -704,10 +570,8 @@
 
 
 
-    JC.Sprite = function(opts) { // opts
+    JC.Sprite = function(opts) {
         JC.DisplayObjectContainer.call(this);
-
-        // this.anchor = new JC.Point();
 
         this.texture = opts.texture;
 
@@ -719,9 +583,9 @@
 
         this.sW = opts.sW||0;
 
-        this.tint = 0xFFFFFF;
+        this.tint = opts.tint||0xFFFFFF;
 
-        this.blendMode = JC.blendModes.NORMAL;
+        this.blendMode = opts.blendModes||JC.blendModes.ALPHA;
 
         this.shader = null;
 
@@ -768,7 +632,7 @@
                 (this.sW+this.width)/w, this.sH/h
             ]);
         }
-        this.cachedTint = this.tint||0xFFFFFF;
+        this.cachedTint = JC.hex2rgb(this.tint);
         this.dirty = true;
     };
     
@@ -801,7 +665,7 @@
         gl.uniform1f(shader.uAlpha, this.worldAlpha);
         gl.uniform2f(shader.projectionVector, projection.x, projection.y);
         gl.uniformMatrix3fv(shader.uMatrix, false, this.worldTransform.toArray(true));
-        gl.uniform3fv(shader.uTint, JC.hex2rgb(this.tint));
+        gl.uniform3fv(shader.uTint, this.cachedTint);
 
     };
 
@@ -822,6 +686,7 @@
 
     JC.Sprite.prototype.upDate = function(renderSession) {
         renderSession.texturesManager.setTexture(this.texture);
+        renderSession.blendModeManager.setBlendMode(this.blendMode);
         this.dirty&&this.createBuffer(renderSession.gl);
         this.syncAttribute(renderSession);
         this.syncUniforms(renderSession);
@@ -880,10 +745,6 @@
         JC.DisplayObjectContainer.call(this);
 
         this.worldTransform = new JC.Matrix();
-
-        this.interactive = true;
-
-        this.dirty = true;
 
         this.stage = this;
 
@@ -1011,8 +872,6 @@
 
 
     JC.SpriteShader = function(gl) {
-        this._UID = JC._UID++;
-
         this.gl = gl;
 
         this.program = null;
@@ -1070,17 +929,12 @@
         this.aVertexPosition = gl.getAttribLocation(program, 'aVertexPosition');
         this.aTextureCoord = gl.getAttribLocation(program, 'aTextureCoord');
 
-        // this.attributes = [this.aVertexPosition, this.aPositionCoord];
-
         this.program = program;
     };
 
     JC.SpriteShader.prototype.destroy = function() {
         this.gl.deleteProgram(this.program);
-        this.uniforms = null;
         this.gl = null;
-
-        // this.attributes = null;
     };
 
 
@@ -1094,7 +948,7 @@
             options = JC.defaultRenderOptions;
         }
 
-        // JC.sayHello('webGL');
+        JC.sayHello();
 
         this.resolution = options.resolution || window.devicePixelRatio;
 
@@ -1135,8 +989,6 @@
 
         this.maskManager = new JC.WebGLMaskManager();
 
-        // this.stencilManager = new JC.WebGLStencilManager();
-
         this.blendModeManager = new JC.WebGLBlendModeManager();
 
         this.renderSession = {};
@@ -1145,7 +997,6 @@
         this.renderSession.texturesManager = this.texturesManager;
         this.renderSession.maskManager = this.maskManager;
         this.renderSession.blendModeManager = this.blendModeManager;
-        // this.renderSession.stencilManager = this.stencilManager;
         this.renderSession.renderer = this;
         this.renderSession.resolution = this.resolution;
 
@@ -1156,18 +1007,13 @@
         this.mapBlendModes();
     };
 
-    // constructor
     JC.Renderer.prototype.constructor = JC.Renderer;
 
-    /**
-     * @method initContext
-     */
     JC.Renderer.prototype.initContext = function() {
         var gl = this.view.getContext('webgl', this._contextOptions) || this.view.getContext('experimental-webgl', this._contextOptions);
         this.gl = gl;
 
         if (!gl) {
-            // fail, not able to get a context
             throw new Error('This browser does not support webGL. Try using the canvas renderer');
         }
 
@@ -1215,7 +1061,7 @@
     };
 
     JC.Renderer.prototype.renderDisplayObject = function(displayObject, projection, buffer) {
-        this.renderSession.blendModeManager.setBlendMode(JC.blendModes.NORMAL);
+        this.renderSession.blendModeManager.setBlendMode(JC.blendModes.ALPHA);
 
         // set the default projection
         this.renderSession.projection = projection;
@@ -1223,14 +1069,9 @@
         //set the default offset
         this.renderSession.offset = this.offset;
 
-        // start the sprite batch
-        // this.spriteBatch.begin(this.renderSession);
-
         // render the scene!
         displayObject.render(this.renderSession);
 
-        // finish the sprite batch
-        // this.spriteBatch.end();
     };
 
     JC.Renderer.prototype.resize = function(width, height) {
@@ -1274,7 +1115,7 @@
             JC.blendModesWebGL = [];
 
             JC.blendModesWebGL[JC.blendModes.NORMAL]      = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-            JC.blendModesWebGL[JC.blendModes.ALPHA]      = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
+            JC.blendModesWebGL[JC.blendModes.ALPHA]       = [gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA];
             JC.blendModesWebGL[JC.blendModes.ADD]         = [gl.SRC_ALPHA, gl.DST_ALPHA];
             JC.blendModesWebGL[JC.blendModes.MULTIPLY]    = [gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA];
             JC.blendModesWebGL[JC.blendModes.SCREEN]      = [gl.SRC_ALPHA, gl.ONE];
@@ -1293,8 +1134,6 @@
 
     JC.TexturesManager.prototype.setContext = function(gl) {
         this.gl = gl;
-        // this.MAX_UNITS = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
-        this._UNITS = 0;
     };
 
     JC.TexturesManager.prototype.setTexture = function(texture) {
@@ -1324,20 +1163,16 @@
         
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.img);
         
-        // gl.generateMipmap(gl.TEXTURE_2D);
+        if(texture.isPowerOfTwo)gl.generateMipmap(gl.TEXTURE_2D);
 
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-        
-        texture.unit = this._UNITS;
 
         this.textures[texture.id] = texture;
 
         gl.bindTexture(gl.TEXTURE_2D, null);
-
-        this._UNITS++;
     };
 
     JC.TexturesManager.prototype.destroy = function() {
@@ -1448,8 +1283,6 @@
     JC.WebGLMaskManager.prototype.destroy = function() {
         this.gl = null;
     };
-
-
 
 
     /**

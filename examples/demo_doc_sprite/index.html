@@ -151,11 +151,12 @@ images.onLoaded = function(){
             sW: 32*rnd(),
             sH: 32*rnd()
         });
+        sprites[i].alpha = 0.5+Math.random()*0.5;
         sprites[i].x = (Math.random()-0.5)*w;
         sprites[i].y = (Math.random()-0.5)*h;
 
         sprites[i].moveTween({
-            attr: {x: (Math.random()-0.5)*w,y: (Math.random()-0.5)*h,rotation: 720*JC.DTR,scaleX: 1.5,scaleY: 1.5},
+            attr: {alpha: 0,x: (Math.random()-0.5)*w,y: (Math.random()-0.5)*h,rotation: 720*JC.DTR,scaleX: 1.5,scaleY: 1.5},// 
             infinity: true,
             alternate: true,
             time: Math.random()*1000+1000

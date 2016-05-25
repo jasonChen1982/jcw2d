@@ -6,6 +6,7 @@
         this.img = img;
         this.width = img.width;
         this.height = img.height;
+        this.isPowerOfTwo = JC.isPowerOfTwo(this.width,this.height);
     };
 
 
