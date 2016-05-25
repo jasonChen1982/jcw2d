@@ -1100,11 +1100,6 @@
     JC.Renderer.prototype.handleContextRestored = function() {
         this.initContext();
 
-        for (var key in JC.TextureCache) {
-            var texture = JC.TextureCache[key].baseTexture;
-            texture._glTextures = [];
-        }
-
         this.contextLost = false;
     };
 
