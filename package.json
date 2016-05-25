@@ -1,6 +1,6 @@
 {
   "name": "jcw2d",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "webgl 2d 2.5d jc canvas",
   "main": "src/jcw2d.js",
   "scripts": {
