@@ -1193,6 +1193,8 @@
         this.currentBlendMode = blendMode;
 
         var blendModeWebGL = JC.blendModesWebGL[this.currentBlendMode];
+        
+        this.gl.blendEquation( this.gl.FUNC_ADD );
         this.gl.blendFunc(blendModeWebGL[0], blendModeWebGL[1]);
 
         return true;
