@@ -60,20 +60,16 @@
 
         this.ucHole = sPX/tPX;
 
-
         this.suit();
-        setTimeout(function(){
-        document.title = parseInt(window.getComputedStyle(dom, null).fontSize);
-
-    },100);
     };
     UI.suit = function(){
         var nowSize = this.VOH==='width'? window.innerWidth||document.documentElement.offsetWidth : window.innerHeight||document.documentElement.offsetWidth;
-        this.curPPR = this.ucHole * this.rem * nowSize / this.DsgSize;
+        this.sPPR = this.rem * nowSize / this.DsgSize;
+        this.curPPR = this.ucHole * this.sPPR;
         this.root.style.fontSize = this.curPPR + 'px';
     };
-    UI.RTP = function(rem){
-        return rem*this.curPPR >> 0;
+    UI.RTP = function(rem,bool){
+        return (bool?rem*this.curPPR:rem*this.sPPR) >> 0;
     };
     UI.PTR = function(px){
         return px/this.curPPR;
