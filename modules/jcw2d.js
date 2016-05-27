@@ -424,8 +424,14 @@
     JC.DisplayObjectContainer.prototype = Object.create(JC.DisplayObject.prototype);
     JC.DisplayObjectContainer.prototype.constructor = JC.DisplayObjectContainer;
 
-    JC.DisplayObjectContainer.prototype.addChild = function(child) {
-        return this.addChildAt(child, this.children.length);
+    JC.DisplayObjectContainer.prototype.addChilds = function() {
+        var l = arguments.length;
+        if(l>0){
+            for(var i=0;i<l;i++){
+                this.addChildAt(arguments[i], this.children.length);
+            }
+            return arguments[l-1];
+        }
     };
 
     JC.DisplayObjectContainer.prototype.addChildAt = function(child, index) {
