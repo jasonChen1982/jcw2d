@@ -746,6 +746,39 @@
 
 
 
+    JC.Particles = function(opts) {
+        JC.DisplayObjectContainer.call(this);
+
+        this.texture = opts.texture;
+
+        this.width = opts.width||this.texture.width;
+
+        this.height = opts.height||this.texture.height;
+
+        this.sH = opts.sH||0;
+
+        this.sW = opts.sW||0;
+
+        this.tint = opts.tint||0xFFFFFF;
+
+        this.blendMode = opts.blendModes||JC.blendModes.ALPHA;
+
+        this.shader = null;
+
+        this.repeatX = opts.repeatX||false;
+        this.repeatY = opts.repeatY||false;
+
+        this.renderable = true;
+
+        this.buildMesh();
+
+    };
+
+    JC.Particles.prototype = Object.create(JC.DisplayObjectContainer.prototype);
+    JC.Particles.prototype.constructor = JC.Particles;
+
+
+
 
     JC.Stage = function(backgroundColor) {
         JC.DisplayObjectContainer.call(this);
