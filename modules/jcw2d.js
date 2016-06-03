@@ -352,6 +352,15 @@
         }
     };
 
+    JC.DisplayObject.prototype.upDate = function(renderSession) {
+        renderSession.texturesManager.setTexture(this.texture);
+        renderSession.shaderManager.setShader(this.shaderType);
+        renderSession.blendModeManager.setBlendMode(this.blendMode);
+        this.dirty&&this.createBuffer(renderSession.gl);
+        this.syncAttribute(renderSession);
+        this.syncUniforms(renderSession);
+    };
+
     JC.DisplayObject.prototype.updateTransform = function() {
         var pt = this.parent.worldTransform;
         var wt = this.worldTransform;
@@ -594,6 +603,7 @@
         this.blendMode = opts.blendModes||JC.blendModes.ALPHA;
 
         this.shader = null;
+        this.shaderType = 'sprite';
 
         this.repeatX = opts.repeatX||false;
         this.repeatY = opts.repeatY||false;
@@ -690,14 +700,6 @@
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
     };
 
-    JC.Sprite.prototype.upDate = function(renderSession) {
-        renderSession.texturesManager.setTexture(this.texture);
-        renderSession.blendModeManager.setBlendMode(this.blendMode);
-        this.dirty&&this.createBuffer(renderSession.gl);
-        this.syncAttribute(renderSession);
-        this.syncUniforms(renderSession);
-    };
-
     JC.Sprite.prototype.render = function(renderSession) {
         if (!this.visible || this.alpha <= 0) return;
         this.upDate(renderSession);
@@ -746,27 +748,68 @@
 
 
 
+
+    JC.Point = function(opts) {
+        this.x = opts.x;
+        this.y = opts.y;
+
+        this.radius = opts.radius || 10;
+        this.color = opts.color;
+        this.alpha = opts.alpha;
+
+        this.alive = true;
+
+        this.wander = JC.Math.randIn( 0.5, 2.0 );
+        this.theta = JC.Math.randIn( 0, Math.PI*2 );
+        this.drag = 0.92;
+
+        this.vx = 0.0;
+        this.vy = 0.0;
+    };
+    JC.Point.prototype.move = function() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        this.vx *= this.drag;
+        this.vy *= this.drag;
+
+        this.theta += JC.Math.randIn( -0.5, 0.5 ) * this.wander;
+        this.vx += Math.sin( this.theta ) * 0.1;
+        this.vy += Math.cos( this.theta ) * 0.1;
+
+        this.radius *= 0.96;
+        this.alive = this.radius > 0.5;
+    };
+    JC.Point.prototype.revive = function() {
+        var theta = JC.Math.randIn( 0, Math.PI*2 ),
+            force = JC.Math.randIn( 2, 8 );
+        this.x = JC.Math.randIn( -20, 20 );
+        this.y = JC.Math.randIn( -20, 20 );
+
+        this.vx = Math.sin( theta ) * force;
+        this.vy = Math.cos( theta ) * force;
+
+        this.drag = JC.Math.randIn( 0.9, 0.99 );
+        this.wander = JC.Math.randIn( 0.5, 2.0 );
+
+
+        this.radius = JC.Math.randIn(4,20);
+    };
+
+
+
     JC.Particles = function(opts) {
         JC.DisplayObjectContainer.call(this);
 
+        this.points = [];
+
         this.texture = opts.texture;
-
-        this.width = opts.width||this.texture.width;
-
-        this.height = opts.height||this.texture.height;
-
-        this.sH = opts.sH||0;
-
-        this.sW = opts.sW||0;
 
         this.tint = opts.tint||0xFFFFFF;
 
         this.blendMode = opts.blendModes||JC.blendModes.ALPHA;
 
         this.shader = null;
-
-        this.repeatX = opts.repeatX||false;
-        this.repeatY = opts.repeatY||false;
 
         this.renderable = true;
 
@@ -776,6 +819,71 @@
 
     JC.Particles.prototype = Object.create(JC.DisplayObjectContainer.prototype);
     JC.Particles.prototype.constructor = JC.Particles;
+    JC.Particles.prototype.buildMesh = function() {
+        this.vertices = new JC.Float32Array(this.points.length*2);
+        this.sizes = new JC.Uint16Array(this.points.length);
+        this.point_colors = new JC.Float32Array(this.points.length*4);
+        var ct;
+        for(var i=0;i<this.points.length;i++){
+            this.vertices[2*i] = this.points[i].x;
+            this.vertices[2*i+1] = this.points[i].y;
+            this.sizes[i] = this.points[i].radius;
+            ct = JC.hex2rgb(this.points[i].color);
+            this.point_colors[4*i] = ct[0];
+            this.point_colors[4*i+1] = ct[1];
+            this.point_colors[4*i+2] = ct[2];
+            this.point_colors[4*i+3] = this.points[i].alpha;
+        }
+    };
+    JC.Particles.prototype.createBuffer = function(gl){
+        this.vertexBuffer = gl.createBuffer();
+        this.sizesBuffer = gl.createBuffer();
+        this.colorsBuffer = gl.createBuffer();
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.DYNAMIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.sizesBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, this.sizes, gl.DYNAMIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.colorsBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, this.point_colors, gl.DYNAMIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+        this.dirty = false;
+    };
+    JC.Particles.prototype.syncUniforms = function(renderSession){
+        var gl = renderSession.gl,
+            shader = renderSession.shaderManager.shader,
+            projection = renderSession.projection;
+
+        gl.uniform1i(shader.uSampler, 0);
+        gl.uniform1f(shader.uAlpha, this.worldAlpha);
+        gl.uniform2f(shader.projectionVector, projection.x, projection.y);
+        gl.uniformMatrix3fv(shader.uMatrix, false, this.worldTransform.toArray(true));
+        gl.uniform3fv(shader.uTint, this.cachedTint);
+
+    };
+
+    JC.Particles.prototype.syncAttribute = function(renderSession){
+        var gl = renderSession.gl,
+            shader = renderSession.shaderManager.shader;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+        gl.enableVertexAttribArray(shader.aVertexPosition);
+        gl.vertexAttribPointer(shader.aVertexPosition, 2, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.sizesBuffer);
+        gl.enableVertexAttribArray(shader.aPointSize);
+        gl.vertexAttribPointer(shader.aPointSize, 2, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.colorsBuffer);
+        gl.enableVertexAttribArray(shader.aPointColors);
+        gl.vertexAttribPointer(shader.aPointColors, 4, gl.FLOAT, false, 0, 0);
+
+    };
 
 
 
@@ -972,6 +1080,78 @@
     };
 
     JC.SpriteShader.prototype.destroy = function() {
+        this.gl.deleteProgram(this.program);
+        this.gl = null;
+    };
+
+
+
+
+    JC.PointShader = function(gl) {
+        this.gl = gl;
+
+        this.program = null;
+
+        this.fragmentSrc = [
+            'precision lowp float;',
+            'varying vec2 vTextureCoord;',
+
+            'uniform sampler2D uSampler;',
+            'uniform vec3 uTint;',
+            'uniform float uAlpha;',
+
+            'varying vec4 vPointColor;',
+
+            'void main(void) {',
+            '   vec4 smpColor = texture2D(uSampler, vTextureCoord);',
+            '   gl_FragColor = vec4(uTint,uAlpha) * smpColor;',
+            '}'
+        ];
+
+        this.vertexSrc = [
+            'attribute vec2 aVertexPosition;',
+            'attribute vec2 aTextureCoord;',
+            'attribute float aPointColor;',
+
+            'uniform vec2 projectionVector;',
+            'uniform mat3 uMatrix;',
+
+            'varying vec4 vPointColor;',
+
+            'void main(void) {',
+            '   vec2 v = ( uMatrix * vec3(aVertexPosition , 1.0) ).xy ;',
+            '   gl_Position = vec4( v / projectionVector , 0.0, 1.0);',
+            '   vPointColor = aPointColor;',
+            '}'
+        ];
+
+        this.textureCount = 0;
+
+        this.init();
+    };
+
+    JC.PointShader.prototype.constructor = JC.PointShader;
+
+    JC.PointShader.prototype.init = function() {
+        var gl = this.gl;
+
+        var program = JC.compileProgram(gl, this.vertexSrc, this.fragmentSrc);
+
+        gl.useProgram(program);
+
+        this.uSampler = gl.getUniformLocation(program, 'uSampler');
+        this.projectionVector = gl.getUniformLocation(program, 'projectionVector');
+        this.uMatrix = gl.getUniformLocation(program, 'uMatrix');
+        this.uTint = gl.getUniformLocation(program, 'uTint');
+        this.uAlpha = gl.getUniformLocation(program, 'uAlpha');
+
+        this.aVertexPosition = gl.getAttribLocation(program, 'aVertexPosition');
+        this.aTextureCoord = gl.getAttribLocation(program, 'aTextureCoord');
+
+        this.program = program;
+    };
+
+    JC.PointShader.prototype.destroy = function() {
         this.gl.deleteProgram(this.program);
         this.gl = null;
     };
@@ -1259,6 +1439,9 @@
 
         // this shader is used for the default sprite rendering
         this.shaders['sprite'] = new JC.SpriteShader(gl);
+
+        // this shader is used for the particle rendering
+        this.shaders['particle'] = new JC.PointShader(gl);
 
         this.setShader('sprite');
     };
