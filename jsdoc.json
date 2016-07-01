@@ -1,51 +1,26 @@
 {
-    "tags": {
-        "allowUnknownTags": false
+  "tags": {
+    "allowUnknownTags": true
+  },
+  "source": {
+    "excludePattern": "(^|\\/|\\\\)_"
+  },
+  "opts": {
+    "destination": "./docs"
+  },
+  "plugins": [
+    "plugins/markdown"
+  ],
+  "templates": {
+    "cleverLinks": false,
+    "monospaceLinks": false,
+    "default": {
+      "outputSourceFiles": true
     },
-    "source": {
-        "include": [
-            "./modules/"
-        ],
-        "includePattern": ".+\\.js(doc)?$"
-    },
-    "plugins": [
-        "plugins/markdown"
-    ],
-    "templates": {
-        "cleverLinks"   : false,
-        "monospaceLinks": false,
-        "default"       : {
-            "outputSourceFiles" : true
-        },
-        "applicationName": "jcc2d",
-        "footer"        : "Made with ♥ by <a href='http://www.jason82.com'> Jason Chen </a>",
-        "copyright"     : "jcc2d Copyright © 2015-2017 jason Chen.",
-        "disqus": "",
-        "googleAnalytics": "",
-        "openGraph": {
-            "title": "",
-            "type": "website",
-            "image": "",
-            "site_name": "",
-            "url": ""
-        },
-        "meta": {
-            "title": "",
-            "description": "",
-            "keyword": ""
-        },
-        "linenums"      : true
-    },
-    "markdown"  : {
-        "parser"        : "gfm",
-        "hardwrap"      : true
-    },
-    "opts": {
-        "encoding"      : "utf8",
-        "recurse"       : true,
-        "private"       : false,
-        "lenient"       : true,
-        "destination"   : "./docs",
-        "template"      : "./node_modules/jaguarjs-jsdoc"
-    }
+    "path": "ink-docstrap",
+    "theme": "cerulean",
+    "navType": "vertical",
+    "linenums": true,
+    "dateFormat": "MMMM Do YYYY, h:mm:ss a"
+  }
 }
