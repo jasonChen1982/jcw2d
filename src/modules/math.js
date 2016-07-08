@@ -1,18 +1,12 @@
-(function() {
+JC.Math = {
+    clamp: function(x, a, b) {
 
-	window.JC = window.JC||{};
+        return (x < a) ? a : ((x > b) ? b : x);
 
-	JC.Math = {
-        clamp: function ( x, a, b ) {
+    },
+    randIn: function(low, high) {
 
-            return ( x < a ) ? a : ( ( x > b ) ? b : x );
+        return low + Math.random() * (high - low);
 
-        },
-        randIn: function ( low, high ) {
-
-			return low + Math.random() * ( high - low );
-
-		}
-	};
-
-})();
+    }
+};
