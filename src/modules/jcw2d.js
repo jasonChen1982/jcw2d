@@ -749,141 +749,141 @@
 
 
 
-    JC.Point = function(opts) {
-        this.x = opts.x;
-        this.y = opts.y;
+    // JC.Point = function(opts) {
+    //     this.x = opts.x;
+    //     this.y = opts.y;
 
-        this.radius = opts.radius || 10;
-        this.color = opts.color;
-        this.alpha = opts.alpha;
+    //     this.radius = opts.radius || 10;
+    //     this.color = opts.color;
+    //     this.alpha = opts.alpha;
 
-        this.alive = true;
+    //     this.alive = true;
 
-        this.wander = JC.Math.randIn( 0.5, 2.0 );
-        this.theta = JC.Math.randIn( 0, Math.PI*2 );
-        this.drag = 0.92;
+    //     this.wander = JC.Math.randIn( 0.5, 2.0 );
+    //     this.theta = JC.Math.randIn( 0, Math.PI*2 );
+    //     this.drag = 0.92;
 
-        this.vx = 0.0;
-        this.vy = 0.0;
-    };
-    JC.Point.prototype.move = function() {
-        this.x += this.vx;
-        this.y += this.vy;
+    //     this.vx = 0.0;
+    //     this.vy = 0.0;
+    // };
+    // JC.Point.prototype.move = function() {
+    //     this.x += this.vx;
+    //     this.y += this.vy;
 
-        this.vx *= this.drag;
-        this.vy *= this.drag;
+    //     this.vx *= this.drag;
+    //     this.vy *= this.drag;
 
-        this.theta += JC.Math.randIn( -0.5, 0.5 ) * this.wander;
-        this.vx += Math.sin( this.theta ) * 0.1;
-        this.vy += Math.cos( this.theta ) * 0.1;
+    //     this.theta += JC.Math.randIn( -0.5, 0.5 ) * this.wander;
+    //     this.vx += Math.sin( this.theta ) * 0.1;
+    //     this.vy += Math.cos( this.theta ) * 0.1;
 
-        this.radius *= 0.96;
-        this.alive = this.radius > 0.5;
-    };
-    JC.Point.prototype.revive = function() {
-        var theta = JC.Math.randIn( 0, Math.PI*2 ),
-            force = JC.Math.randIn( 2, 8 );
-        this.x = JC.Math.randIn( -20, 20 );
-        this.y = JC.Math.randIn( -20, 20 );
+    //     this.radius *= 0.96;
+    //     this.alive = this.radius > 0.5;
+    // };
+    // JC.Point.prototype.revive = function() {
+    //     var theta = JC.Math.randIn( 0, Math.PI*2 ),
+    //         force = JC.Math.randIn( 2, 8 );
+    //     this.x = JC.Math.randIn( -20, 20 );
+    //     this.y = JC.Math.randIn( -20, 20 );
 
-        this.vx = Math.sin( theta ) * force;
-        this.vy = Math.cos( theta ) * force;
+    //     this.vx = Math.sin( theta ) * force;
+    //     this.vy = Math.cos( theta ) * force;
 
-        this.drag = JC.Math.randIn( 0.9, 0.99 );
-        this.wander = JC.Math.randIn( 0.5, 2.0 );
-
-
-        this.radius = JC.Math.randIn(4,20);
-    };
+    //     this.drag = JC.Math.randIn( 0.9, 0.99 );
+    //     this.wander = JC.Math.randIn( 0.5, 2.0 );
 
 
+    //     this.radius = JC.Math.randIn(4,20);
+    // };
 
-    JC.Particles = function(opts) {
-        JC.DisplayObjectContainer.call(this);
 
-        this.points = [];
 
-        this.texture = opts.texture;
+    // JC.Particles = function(opts) {
+    //     JC.DisplayObjectContainer.call(this);
 
-        this.tint = opts.tint||0xFFFFFF;
+    //     this.points = [];
 
-        this.blendMode = opts.blendModes||JC.blendModes.ALPHA;
+    //     this.texture = opts.texture;
 
-        this.shader = null;
+    //     this.tint = opts.tint||0xFFFFFF;
 
-        this.renderable = true;
+    //     this.blendMode = opts.blendModes||JC.blendModes.ALPHA;
 
-        this.buildMesh();
+    //     this.shader = null;
 
-    };
+    //     this.renderable = true;
 
-    JC.Particles.prototype = Object.create(JC.DisplayObjectContainer.prototype);
-    JC.Particles.prototype.constructor = JC.Particles;
-    JC.Particles.prototype.buildMesh = function() {
-        this.vertices = new JC.Float32Array(this.points.length*2);
-        this.sizes = new JC.Uint16Array(this.points.length);
-        this.point_colors = new JC.Float32Array(this.points.length*4);
-        var ct;
-        for(var i=0;i<this.points.length;i++){
-            this.vertices[2*i] = this.points[i].x;
-            this.vertices[2*i+1] = this.points[i].y;
-            this.sizes[i] = this.points[i].radius;
-            ct = JC.hex2rgb(this.points[i].color);
-            this.point_colors[4*i] = ct[0];
-            this.point_colors[4*i+1] = ct[1];
-            this.point_colors[4*i+2] = ct[2];
-            this.point_colors[4*i+3] = this.points[i].alpha;
-        }
-    };
-    JC.Particles.prototype.createBuffer = function(gl){
-        this.vertexBuffer = gl.createBuffer();
-        this.sizesBuffer = gl.createBuffer();
-        this.colorsBuffer = gl.createBuffer();
+    //     this.buildMesh();
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.DYNAMIC_DRAW);
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    // };
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.sizesBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, this.sizes, gl.DYNAMIC_DRAW);
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    // JC.Particles.prototype = Object.create(JC.DisplayObjectContainer.prototype);
+    // JC.Particles.prototype.constructor = JC.Particles;
+    // JC.Particles.prototype.buildMesh = function() {
+    //     this.vertices = new JC.Float32Array(this.points.length*2);
+    //     this.sizes = new JC.Uint16Array(this.points.length);
+    //     this.point_colors = new JC.Float32Array(this.points.length*4);
+    //     var ct;
+    //     for(var i=0;i<this.points.length;i++){
+    //         this.vertices[2*i] = this.points[i].x;
+    //         this.vertices[2*i+1] = this.points[i].y;
+    //         this.sizes[i] = this.points[i].radius;
+    //         ct = JC.hex2rgb(this.points[i].color);
+    //         this.point_colors[4*i] = ct[0];
+    //         this.point_colors[4*i+1] = ct[1];
+    //         this.point_colors[4*i+2] = ct[2];
+    //         this.point_colors[4*i+3] = this.points[i].alpha;
+    //     }
+    // };
+    // JC.Particles.prototype.createBuffer = function(gl){
+    //     this.vertexBuffer = gl.createBuffer();
+    //     this.sizesBuffer = gl.createBuffer();
+    //     this.colorsBuffer = gl.createBuffer();
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.colorsBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, this.point_colors, gl.DYNAMIC_DRAW);
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    //     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+    //     gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.DYNAMIC_DRAW);
+    //     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-        this.dirty = false;
-    };
-    JC.Particles.prototype.syncUniforms = function(renderSession){
-        var gl = renderSession.gl,
-            shader = renderSession.shaderManager.shader,
-            projection = renderSession.projection;
+    //     gl.bindBuffer(gl.ARRAY_BUFFER, this.sizesBuffer);
+    //     gl.bufferData(gl.ARRAY_BUFFER, this.sizes, gl.DYNAMIC_DRAW);
+    //     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-        gl.uniform1i(shader.uSampler, 0);
-        gl.uniform1f(shader.uAlpha, this.worldAlpha);
-        gl.uniform2f(shader.projectionVector, projection.x, projection.y);
-        gl.uniformMatrix3fv(shader.uMatrix, false, this.worldTransform.toArray(true));
-        gl.uniform3fv(shader.uTint, this.cachedTint);
+    //     gl.bindBuffer(gl.ARRAY_BUFFER, this.colorsBuffer);
+    //     gl.bufferData(gl.ARRAY_BUFFER, this.point_colors, gl.DYNAMIC_DRAW);
+    //     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-    };
+    //     this.dirty = false;
+    // };
+    // JC.Particles.prototype.syncUniforms = function(renderSession){
+    //     var gl = renderSession.gl,
+    //         shader = renderSession.shaderManager.shader,
+    //         projection = renderSession.projection;
 
-    JC.Particles.prototype.syncAttribute = function(renderSession){
-        var gl = renderSession.gl,
-            shader = renderSession.shaderManager.shader;
+    //     gl.uniform1i(shader.uSampler, 0);
+    //     gl.uniform1f(shader.uAlpha, this.worldAlpha);
+    //     gl.uniform2f(shader.projectionVector, projection.x, projection.y);
+    //     gl.uniformMatrix3fv(shader.uMatrix, false, this.worldTransform.toArray(true));
+    //     gl.uniform3fv(shader.uTint, this.cachedTint);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-        gl.enableVertexAttribArray(shader.aVertexPosition);
-        gl.vertexAttribPointer(shader.aVertexPosition, 2, gl.FLOAT, false, 0, 0);
+    // };
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.sizesBuffer);
-        gl.enableVertexAttribArray(shader.aPointSize);
-        gl.vertexAttribPointer(shader.aPointSize, 2, gl.FLOAT, false, 0, 0);
+    // JC.Particles.prototype.syncAttribute = function(renderSession){
+    //     var gl = renderSession.gl,
+    //         shader = renderSession.shaderManager.shader;
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.colorsBuffer);
-        gl.enableVertexAttribArray(shader.aPointColors);
-        gl.vertexAttribPointer(shader.aPointColors, 4, gl.FLOAT, false, 0, 0);
+    //     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+    //     gl.enableVertexAttribArray(shader.aVertexPosition);
+    //     gl.vertexAttribPointer(shader.aVertexPosition, 2, gl.FLOAT, false, 0, 0);
 
-    };
+    //     gl.bindBuffer(gl.ARRAY_BUFFER, this.sizesBuffer);
+    //     gl.enableVertexAttribArray(shader.aPointSize);
+    //     gl.vertexAttribPointer(shader.aPointSize, 2, gl.FLOAT, false, 0, 0);
+
+    //     gl.bindBuffer(gl.ARRAY_BUFFER, this.colorsBuffer);
+    //     gl.enableVertexAttribArray(shader.aPointColors);
+    //     gl.vertexAttribPointer(shader.aPointColors, 4, gl.FLOAT, false, 0, 0);
+
+    // };
 
 
 
