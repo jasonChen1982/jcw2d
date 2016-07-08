@@ -1,7 +1,6 @@
 {
   "name": "jcw2d",
   "description": "webgl 2d 2.5d jc canvas",
-  "version": "0.0.4",
   "main": "src/jcw2d.js",
   "authors": [
     "jasonChen"

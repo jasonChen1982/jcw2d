@@ -2,11 +2,10 @@
   "name": "jcw2d",
   "version": "0.0.4",
   "description": "webgl 2d 2.5d jc canvas",
-  "main": "src/jcw2d.js",
+  "upto": "../jcw2d-site/examples/libs",
+  "main": "build/jcw2d.js",
   "scripts": {
-    "patch": "npm --no-git-tag-version version patch && git add -A && git commit -m 'patch new version' && bower version patch",
-    "minor": "npm --no-git-tag-version version minor && git add -A && git commit -m 'minor new version' && bower version minor",
-    "major": "npm --no-git-tag-version version major && git add -A && git commit -m 'major new version' && bower version major",
+    "postversion": "git push origin v$npm_package_version",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,7 +22,8 @@
   "author": "jasonChen",
   "license": "ISC",
   "devDependencies": {
-    "gulp-concat": "^2.6.0",
+    "gulp-include": "^2.2.1",
+    "gulp-jsdoc3": "^0.3.0",
     "gulp-sourcemaps": "^2.0.0-alpha",
     "gulp-uglify": "^1.5.3"
   },
