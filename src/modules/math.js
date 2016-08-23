@@ -1,12 +1,20 @@
+function isArray(object) {
+    return Object.prototype.toString.call(object) === '[object Array]';
+}
+
+function isNumber(object) {
+    return typeof object === 'number';
+}
+
 JC.Math = {
     clamp: function(x, a, b) {
-
         return (x < a) ? a : ((x > b) ? b : x);
-
     },
-    randIn: function(low, high) {
-
-        return low + Math.random() * (high - low);
-
+    random: function (min, max) {
+        if (isArray(min))
+            return min[~~(Math.random() * min.length)];
+        if (!isNumber(max))
+            max = min || 1, min = 0;
+        return min + Math.random() * (max - min);
     }
 };
