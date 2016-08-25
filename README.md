@@ -1,9 +1,11 @@
 # jcw2d
+[![Build Status](https://travis-ci.org/jasonChen1982/jcw2d.svg?branch=master)](https://travis-ci.org/jasonChen1982/jcw2d)
+
 一个轻量级的WebGL 2d渲染引擎 [demo&documention](https://jasonchen1982.github.io/jcw2d/)
 
 ### 引擎功能 ###
 
-主要渲染canvas的三种类型的物体，位图、形状和文字。jcc2d提供了简单的API接口来操作物体，并且可以调用每个物体的时间运动函数来使物体做运动。可以操作的属性有alpha、scale、rotation、skew、translate等。
+主要渲染三种类型的物体，位图、形状和文字。jcc2d提供了简单的API接口来操作物体，并且可以调用每个物体的时间运动函数来使物体做运动。可以操作的属性有alpha、scale、rotation、skew、translate等。
 
 ### 框架介绍 ###
 jcc2d有几大主要类型，动画器（Animate）、显示对象（DisplayObject）、容器（Container）、位图（Sprite）、形状（Graphics）、文字（Text）、舞台（Stage）。
