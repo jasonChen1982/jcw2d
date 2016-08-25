@@ -1,5 +1,5 @@
-# jcc2d
-一个轻量级的canvas渲染引擎 [demo&documention](https://jasonchen1982.github.io/jcw2d/)
+# jcw2d
+一个轻量级的WebGL 2d渲染引擎 [demo&documention](https://jasonchen1982.github.io/jcw2d/)
 
 ### 引擎功能 ###
 
@@ -34,4 +34,4 @@ jcc2d有几大主要类型，动画器（Animate）、显示对象（DisplayObje
 
 
 ### 说明 ###
-由于选择轻量级，所以canvas滤镜并没有包含在该库里面。这个版本的事件功能将通过另外一个事件扩展来实现。
+由于选择轻量级，所以canvas滤镜并没有包含在该库里面。
