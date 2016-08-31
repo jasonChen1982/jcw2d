@@ -3,7 +3,7 @@
     "launch_in_dev" : ["phantomjs"],
     "launch_in_ci" : ["phantomjs"],
     "src_files" : [
-        "build/jcc2d.js",
+        "build/jcw2d.js",
 
         "test/setup.js",
         "test/unit/**/*.test.js"
