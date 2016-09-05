@@ -1,6 +1,6 @@
 
 /**
- * jcc2d的事件消息对象的类
+ * jcw2d的事件消息对象的类
  *
  * @class JC.InteractionData
  * @constructor
@@ -59,7 +59,7 @@ JC.InteractionData = InteractionData;
 
 
 /**
- * jcc2d的事件对象的类
+ * jcw2d的事件对象的类
  *
  * @class JC.Eventer
  * @constructor Eventer

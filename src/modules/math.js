@@ -1,11 +1,3 @@
-function isArray(object) {
-    return Object.prototype.toString.call(object) === '[object Array]';
-}
-
-function isNumber(object) {
-    return typeof object === 'number';
-}
-
 JC.Math = {
     clamp: function(x, a, b) {
         return (x < a) ? a : ((x > b) ? b : x);
