@@ -1,6 +1,6 @@
-function GraphicsShader(shaderManager) {
+function GraphicsShader(gl) {
     Shader.call(this,
-        shaderManager,
+        gl,
         // vertex shader
         [
             'attribute vec2 aVertexPosition;',

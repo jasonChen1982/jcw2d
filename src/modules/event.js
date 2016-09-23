@@ -88,18 +88,35 @@ Eventer.prototype.on = function(type, fn) {
  * @private
  */
 Eventer.prototype.off = function(type, fn) {
-    if (this.listeners[type]) {
-        var i = this.listeners[type].length;
-        if (fn) {
+    var ears = this.listeners;
+    var cbs = ears[ type ];
+    var i = ears[type].length;
+    if (cbs&&i>0) {
+        if(fn){
             while (i--) {
-                if (cbs[type][i] === fn) {
-                    cbs[type].splice(i, 1);
+                if (cbs[i] === fn) {
+                    cbs.splice(i, 1);
                 }
             }
-        } else {
-            cbs[type].length = 0;
+        }else{
+            cbs.length = 0;
         }
     }
+};
+/**
+ * 事件对象的事件解绑函数
+ *
+ * @param type {String} 事件类型
+ * @param fn {Function} 注册时回调函数的引用
+ * @private
+ */
+Eventer.prototype.once = function(type, fn) {
+    var This = this,
+        cb = function(ev) {
+            fn && fn(ev);
+            This.off(type, cb);
+        };
+    this.on(type, cb);
 };
 /**
  * 事件对象的触发事件函数

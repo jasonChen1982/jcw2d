@@ -5,7 +5,7 @@ function Texture(baseTexture, frame) {
 
     if (!frame) {
         this.noFrame = true;
-        frame = new math.Rectangle(0, 0, 1, 1);
+        frame = new JC.Rectangle(0, 0, 1, 1);
     }
 
     if (baseTexture instanceof Texture) {
@@ -28,18 +28,18 @@ function Texture(baseTexture, frame) {
 
     if (baseTexture.hasLoaded) {
         if (this.noFrame) {
-            frame = new math.Rectangle(0, 0, baseTexture.width, baseTexture.height);
+            frame = new JC.Rectangle(0, 0, baseTexture.width, baseTexture.height);
 
             // if there is no frame we should monitor for any base texture changes..
-            baseTexture.on('update', this.onBaseTextureUpdated, this);
+            baseTexture.on('update', this.onBaseTextureUpdated.bind(this));
         }
         this.frame = frame;
     } else {
-        baseTexture.once('loaded', this.onBaseTextureLoaded, this);
+        baseTexture.once('loaded', this.onBaseTextureLoaded.bind(this));
     }
 
 }
-
+JC.Texture = Texture;
 Texture.prototype = Object.create(JC.Eventer.prototype);
 Texture.prototype.constructor = Texture;
 
@@ -57,7 +57,6 @@ Object.defineProperties(Texture.prototype, {
             this.height = frame.height;
 
             this.valid = frame && frame.width && frame.height && this.baseTexture.hasLoaded;
-
             if (this.valid) {
                 this._updateUvs();
             }
@@ -69,22 +68,22 @@ Texture.prototype.update = function() {
     this.baseTexture.update();
 };
 
-Texture.prototype.onBaseTextureLoaded = function(baseTexture) {
+Texture.prototype.onBaseTextureLoaded = function() {
     // TODO this code looks confusing.. boo to abusing getters and setterss!
     if (this.noFrame) {
-        this.frame = new math.Rectangle(0, 0, baseTexture.width, baseTexture.height);
+        this.frame = new JC.Rectangle(0, 0, this.baseTexture.width, this.baseTexture.height);
     } else {
         this.frame = this._frame;
     }
 
-    this.emit('update', this);
+    this.emit({type: 'loaded'});
 };
 
-Texture.prototype.onBaseTextureUpdated = function(baseTexture) {
-    this._frame.width = baseTexture.width;
-    this._frame.height = baseTexture.height;
+Texture.prototype.onBaseTextureUpdated = function() {
+    this._frame.width = this.baseTexture.width;
+    this._frame.height = this.baseTexture.height;
 
-    this.emit('update', this);
+    this.emit({type: 'update'});
 };
 
 Texture.prototype._updateUvs = function() {

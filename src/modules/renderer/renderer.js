@@ -16,7 +16,7 @@ function Renderer(view, options) {
     this.width = this.view.width;
     this.height = this.view.height;
 
-    this.projection = new Float32Array([this.width >> 1, this.width >> 1]);
+    this.projection = new Float32Array([this.width >> 1, this.height >> 1]);
 
     this.resolution = options.resolution;
 
@@ -54,16 +54,17 @@ function Renderer(view, options) {
     };
 
     // this.drawCount = 0;
-
-    this.shaderManager = new JC.ShaderManager(this);
-
-    this.blendModeManager = new JC.BlendModeManager(this);
+    this.event = new JC.Eventer();
 
     this._createContext();
     this._initContext();
 
     this._mapGlModes();
 
+
+    this.shaderManager = new JC.ShaderManager(this);
+
+    this.blendModeManager = new JC.BlendModeManager(this);
 
     this.renderSession = {};
     this.renderSession.gl = this.gl;
@@ -72,14 +73,16 @@ function Renderer(view, options) {
     this.renderSession.blendModeManager = this.blendModeManager;
     this.renderSession.renderer = this;
     this.renderSession.resolution = this.resolution;
-    this.renderSession.projection = this.projection;
 
+    this._tempDisplayObjectParent = {worldTransform: JC.IDENTITY, worldAlpha:1, children:[]};
+
+    this.pt = -1;
+    this.timeScale = 1;
 }
 
 // constructor
 JC.Renderer = Renderer;
-Renderer.prototype = Object.create(SystemRenderer.prototype);
-Renderer.prototype.constructor = Renderer;
+Renderer.prototype.constructor = JC.Renderer;
 
 Renderer.prototype._createContext = function() {
     var gl = this.view.getContext('webgl', this._contextOptions) || this.view.getContext('experimental-webgl', this._contextOptions);
@@ -99,23 +102,29 @@ Renderer.prototype._initContext = function() {
     gl.disable(gl.CULL_FACE);
     gl.enable(gl.BLEND);
 
-    this.emit('context', gl);
+    this.event.emit({type: 'context'}, gl);
 
     this.resize(this.width, this.height);
 
 };
 
 Renderer.prototype.render = function(object) {
+    if(this.pt<=0||Date.now()-this.pt>200)this.pt = Date.now();
+    var snippet = Date.now()-this.pt;
+    this.pt += snippet;
 
-    this.emit('prerender');
+    this.event.emit({type: 'prerender'});
 
     if (this.gl.isContextLost()) {
         return;
     }
 
     // this.drawCount = 0;
-
-    object.updateTransform();
+    this.renderSession.projection = this.projection;
+    var cacheParent = object.parent;
+    object.parent = this._tempDisplayObjectParent;
+    object.updateTransform(this.timeScale*snippet);
+    object.parent = cacheParent;
 
     var gl = this.gl;
 
@@ -132,7 +141,7 @@ Renderer.prototype.render = function(object) {
 
     this.renderDisplayObject(object);
 
-    this.emit('postrender');
+    this.event.emit({type: 'postrender'});
 };
 
 Renderer.prototype.renderDisplayObject = function(displayObject) {
@@ -179,8 +188,8 @@ Object.defineProperties(Renderer.prototype, {
         },
         set: function(val) {
             this._backgroundColor = val;
-            this._backgroundColorString = utils.hex2string(val);
-            utils.hex2rgb(val, this._backgroundColorRgb);
+            this._backgroundColorString = JC.UTILS.hex2string(val);
+            JC.UTILS.hex2rgb(val, this._backgroundColorRgb);
         }
     }
 });
@@ -191,8 +200,9 @@ Renderer.prototype.resize = function(width, height) {
 
     this.view.width = this.width;
     this.view.height = this.height;
+    this.gl.viewport(0, 0, this.width, this.height);
 
-    this.projection = new Float32Array([this.width >> 1, this.width >> 1]);
+    this.projection = new Float32Array([this.width >> 1, this.height >> 1]);
 
     if (this.autoResize) {
         this.view.style.width = this.width / this.resolution + 'px';

@@ -21,7 +21,7 @@ ShaderManager.prototype.init = function() {
         particle: new ParticleShader(gl),
         sprite: new SpriteShader(gl),
         graphics: new GraphicsShader(gl),
-        text: new TextShader(gl)
+        // text: new TextShader(gl)
     };
 };
 

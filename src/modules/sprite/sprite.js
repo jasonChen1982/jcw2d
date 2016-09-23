@@ -1,6 +1,8 @@
 function Sprite(texture) {
     JC.Container.call(this);
 
+    this._ready = false;
+
     this.regX = 0;
 
     this.regY = 0;
@@ -17,8 +19,6 @@ function Sprite(texture) {
 
     this.cachedAlpha = this.alpha;
 
-    this.texture = texture;
-
     this.vertices = null;
 
     this.indices = new Uint16Array([0,1,2,0,2,3]);
@@ -30,6 +30,8 @@ function Sprite(texture) {
     this.dynamicData = null;
 
     this.indexBuffer = null;
+
+    this.texture = texture;
 
 }
 
@@ -50,14 +52,16 @@ Object.defineProperties(Sprite.prototype, {
             this._texture = value;
             this.cachedTint = 0xFFFFFF;
 
+
             if (value) {
                 // wait for the texture to load
                 if (value.baseTexture.hasLoaded) {
                     this.upTexture();
+                    this._ready = true;
                 } else {
                     var This = this;
-                    value.on('load', function() {
-                        This.upTexture(opts);
+                    value.on('loaded', function() {
+                        This.upTexture();
                         This._ready = true;
                     });
                 }
@@ -69,7 +73,7 @@ Object.defineProperties(Sprite.prototype, {
             if (this.tint === this.cachedTint && this.cachedAlpha === this.alpha && this.colors) return this.colors;
             this.cachedTint = this.tint;
             this.cachedAlpha = this.alpha;
-            this.colors = new Float32Array(JC.UTILS.hex2rgb(this.tint).push(this.alpha));
+            this.colors = new Float32Array(JC.UTILS.hex2rgb(this.tint).concat([this.alpha]));
             return this.colors;
         }
     }
@@ -92,17 +96,19 @@ Sprite.prototype.setBounds = function(points, needless) {
     this.bounds = points;
 };
 
-Sprite.prototype.render = function(session) {
+Sprite.prototype.renderMe = function(session) {
+    if(!this._ready)return;
     session.blendModeManager.setBlendMode(this.blendMode);
     session.shaderManager.setShader(this.shaderType);
     var shader = session.shaderManager.currentShader;
     shader.uniforms.projectionMatrix.value = this.worldTransform.toArray(true);
     shader.uniforms.projectionVector.value = session.projection;
     shader.uniforms.uSampler.value = this.texture;
+    shader.syncUniforms();
     var gl = session.gl;
 
     this.initBuffers(gl,shader);
-    this.uploadDynamic(gl,shader);
+    this.uploadDynamic(gl);
     this.bindBuffers(gl,shader);
 
     gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
@@ -144,21 +150,22 @@ Sprite.prototype.bindBuffers = function(gl,shader) {
 
     for (i in shader.attributes) {
         property = shader.attributes[i];
-        gl.enableVertexAttribArray(property.attribute._location);
-        gl.vertexAttribPointer(property.attribute._location, property.size, gl.FLOAT, false, this.dynamicStride * 4, property.offset * 4);
+        gl.enableVertexAttribArray(property._location);
+        gl.vertexAttribPointer(property._location, property.size, gl.FLOAT, false, this.dynamicStride * 4, property.offset * 4);
     }
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
 };
-Sprite.prototype.uploadDynamic = function() {
+Sprite.prototype.uploadDynamic = function(gl) {
 
     var uvs = this.texture._uvs.get();
+
     for(var i = 0;i<4;i++){
         this.dynamicData[i*this.dynamicStride] = this.vertices[i*2];
         this.dynamicData[i*this.dynamicStride+1] = this.vertices[i*2+1];
 
-        this.dynamicData[i*this.dynamicStride+2] = this.uvs[i*2];
-        this.dynamicData[i*this.dynamicStride+3] = this.uvs[i*2+1];
+        this.dynamicData[i*this.dynamicStride+2] = uvs[i*2];
+        this.dynamicData[i*this.dynamicStride+3] = uvs[i*2+1];
 
 
         this.dynamicData[i*this.dynamicStride+4] = this.aColor[0];

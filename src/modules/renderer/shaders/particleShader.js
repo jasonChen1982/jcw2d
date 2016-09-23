@@ -1,4 +1,4 @@
-function ParticleShader(shaderManager) {
+function ParticleShader(gl) {
     var uniforms = {
         uAlpha: { type: '1f', value: 1 },
         uSampler: { type: 'sampler2D', value: 0 },
@@ -15,11 +15,6 @@ function ParticleShader(shaderManager) {
         }
     };
 
-    if (customUniforms) {
-        for (var u in customUniforms) {
-            uniforms[u] = customUniforms[u];
-        }
-    }
 
 
     var attributes = {
@@ -29,12 +24,6 @@ function ParticleShader(shaderManager) {
         aPositionCoord: 0,
         aRotation: 0
     };
-
-    if (customAttributes) {
-        for (var a in customAttributes) {
-            attributes[a] = customAttributes[a];
-        }
-    }
 
     var vertexSrc = [
         'precision lowp float;',
@@ -87,7 +76,5 @@ function ParticleShader(shaderManager) {
 
 }
 
-ParticleShader.prototype = Object.create(TextureShader.prototype);
+ParticleShader.prototype = Object.create(Shader.prototype);
 ParticleShader.prototype.constructor = ParticleShader;
-
-module.exports = ParticleShader;

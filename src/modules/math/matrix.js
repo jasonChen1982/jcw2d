@@ -36,7 +36,7 @@ Matrix.prototype.fromArray = function(array) {
  * @return {number[]} 返回数组
  */
 Matrix.prototype.toArray = function(transpose) {
-    if (!this.array) this.array = new JC.Float32Array(9);
+    if (!this.array) this.array = new Float32Array(9);
     var array = this.array;
 
     if (transpose) {

@@ -28,6 +28,7 @@
     //=include modules/animation.js
 
     //=include modules/math/point.js
+    //=include modules/math/rectangle.js
     //=include modules/math/matrix.js
 
     //=include modules/textures/baseTexture.js
@@ -45,6 +46,7 @@
 
     //=include modules/renderer/renderer.js
     //=include modules/renderer/manager/shaderManager.js
+    //=include modules/renderer/manager/blendModeManager.js
     //=include modules/renderer/shaders/shader.js
     //=include modules/renderer/shaders/spriteShader.js
     //=include modules/renderer/shaders/particleShader.js

@@ -250,12 +250,7 @@ DisplayObject.prototype.off = function(type, fn) {
  * @param fn {Function} 回调函数
  */
 DisplayObject.prototype.once = function(type, fn) {
-    var This = this,
-        cb = function(ev) {
-            fn && fn(ev);
-            This.event.off(type, cb);
-        };
-    this.event.on(type, cb);
+    this.event.once(type, cb);
 };
 /**
  * 获取当前坐标系下的监测区域

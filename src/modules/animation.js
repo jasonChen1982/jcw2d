@@ -80,8 +80,8 @@ Transition.prototype.update = function(snippet) {
             this.repeats > 0 && --this.repeats;
             this.progress = 0;
             if (this.alternate) {
-                var sc = JC.copyJSON(this.ATRS);
-                this.ATRS = JC.copyJSON(this.ATRE);
+                var sc = JC.UTILS.copyJSON(this.ATRS);
+                this.ATRS = JC.UTILS.copyJSON(this.ATRE);
                 this.ATRE = sc;
             } else {
                 this.element.setVal(this.ATRS);
@@ -337,8 +337,8 @@ PathMotion.prototype.update = function(snippet) {
             this.repeats > 0 && --this.repeats;
             this.progress = 0;
             if (this.alternate) {
-                var sc = JC.copyJSON(this.ATRS);
-                this.ATRS = JC.copyJSON(this.ATRE);
+                var sc = JC.UTILS.copyJSON(this.ATRS);
+                this.ATRS = JC.UTILS.copyJSON(this.ATRE);
                 this.ATRE = sc;
             } else {
                 this.element.setVal(this.ATRS);

@@ -15,7 +15,7 @@ function Shader(gl, vertexSrc, fragmentSrc, uniforms, attributes) {
 
     this.textureCount = 1;
 
-    this.MAX_TEXTURE_UNITS = gl.getParameter(MAX_TEXTURE_IMAGE_UNITS);
+    this.MAX_TEXTURE_UNITS = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
 
     this.vertexSrc = vertexSrc;
 
@@ -348,14 +348,14 @@ Shader.prototype.updateTexture = function(texture) {
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultipliedAlpha);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.source);
 
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, texture.scaleMode === JC.SCALE_MODES.LINEAR ? gl.LINEAR : gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, texture.scaleMode === JC.CONST.SCALE_MODES.LINEAR ? gl.LINEAR : gl.NEAREST);
 
 
     if (texture.mipmap && texture.isPowerOfTwo) {
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, texture.scaleMode === JC.SCALE_MODES.LINEAR ? gl.LINEAR_MIPMAP_LINEAR : gl.NEAREST_MIPMAP_NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, texture.scaleMode === JC.CONST.SCALE_MODES.LINEAR ? gl.LINEAR_MIPMAP_LINEAR : gl.NEAREST_MIPMAP_NEAREST);
         gl.generateMipmap(gl.TEXTURE_2D);
     } else {
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, texture.scaleMode === JC.SCALE_MODES.LINEAR ? gl.LINEAR : gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, texture.scaleMode === JC.CONST.SCALE_MODES.LINEAR ? gl.LINEAR : gl.NEAREST);
     }
 
     if (!texture.isPowerOfTwo) {
