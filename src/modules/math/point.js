@@ -22,7 +22,8 @@ function Point(x, y)
     this.y = y || 0;
 }
 
-Point.prototype.constructor = Point;
+JC.Point = Point;
+Point.prototype.constructor = JC.Point;
 
 /**
  * Creates a clone of this point

@@ -144,5 +144,5 @@ Container.prototype.start = function(){
     this.paused = false;
 };
 Container.prototype.cancle = function(){
-    this.living = false;
+    this.Animator.animates.length = 0;
 };

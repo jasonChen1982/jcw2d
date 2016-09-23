@@ -14,6 +14,7 @@ function Matrix(){
     this.ty = 0;
 }
 JC.Matrix = Matrix;
+Matrix.prototype.constructor = JC.Matrix;
 
 /**
  * 从数组设置一个矩阵

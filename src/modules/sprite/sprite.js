@@ -1,7 +1,5 @@
-
-function Sprite(texture)
-{
-    Container.call(this);
+function Sprite(texture) {
+    JC.Container.call(this);
 
     /**
      * The anchor sets the origin point of the texture.
@@ -11,7 +9,7 @@ function Sprite(texture)
      *
      * @member {PIXI.Point}
      */
-    this.anchor = new math.Point();
+    this.anchor = new JC.Point();
 
     /**
      * The texture that the sprite is using
@@ -52,7 +50,7 @@ function Sprite(texture)
      * @default PIXI.BLEND_MODES.NORMAL
      * @see PIXI.BLEND_MODES
      */
-    this.blendMode = JC.BLEND_MODES.NORMAL;
+    this.blendMode = JC.CONST.BLEND_MODES.NORMAL;
 
     /**
      * The shader that will be used to render the sprite. Set to null to remove a current shader.
@@ -70,13 +68,13 @@ function Sprite(texture)
     this.cachedTint = 0xFFFFFF;
 
     // call texture setter
-    this.texture = texture || Texture.EMPTY;
+    this.texture = texture;
 }
 
 // constructor
 JC.Sprite = Sprite;
-Sprite.prototype = Object.create(Container.prototype);
-Sprite.prototype.constructor = Sprite;
+Sprite.prototype = Object.create(JC.Container.prototype);
+Sprite.prototype.constructor = JC.Sprite;
 
 Object.defineProperties(Sprite.prototype, {
     /**
@@ -86,12 +84,10 @@ Object.defineProperties(Sprite.prototype, {
      * @memberof PIXI.Sprite#
      */
     width: {
-        get: function ()
-        {
+        get: function() {
             return Math.abs(this.scale.x) * this.texture._frame.width;
         },
-        set: function (value)
-        {
+        set: function(value) {
             var sign = utils.sign(this.scale.x) || 1;
             this.scale.x = sign * value / this.texture._frame.width;
             this._width = value;
@@ -105,12 +101,10 @@ Object.defineProperties(Sprite.prototype, {
      * @memberof PIXI.Sprite#
      */
     height: {
-        get: function ()
-        {
-            return  Math.abs(this.scale.y) * this.texture._frame.height;
+        get: function() {
+            return Math.abs(this.scale.y) * this.texture._frame.height;
         },
-        set: function (value)
-        {
+        set: function(value) {
             var sign = utils.sign(this.scale.y) || 1;
             this.scale.y = sign * value / this.texture._frame.height;
             this._height = value;
@@ -124,29 +118,22 @@ Object.defineProperties(Sprite.prototype, {
      * @memberof PIXI.Sprite#
      */
     texture: {
-        get: function ()
-        {
-            return  this._texture;
+        get: function() {
+            return this._texture;
         },
-        set: function (value)
-        {
-            if (this._texture === value)
-            {
+        set: function(value) {
+            if (this._texture === value) {
                 return;
             }
 
             this._texture = value;
             this.cachedTint = 0xFFFFFF;
 
-            if (value)
-            {
+            if (value) {
                 // wait for the texture to load
-                if (value.baseTexture.hasLoaded)
-                {
+                if (value.baseTexture.hasLoaded) {
                     this._onTextureUpdate();
-                }
-                else
-                {
+                } else {
                     value.once('update', this._onTextureUpdate, this);
                 }
             }
@@ -159,25 +146,24 @@ Object.defineProperties(Sprite.prototype, {
  *
  * @private
  */
-Sprite.prototype.upTexture = function ()
-{
+Sprite.prototype.upTexture = function() {
     this._textureW = opts.texture.width;
     this._textureH = opts.texture.height;
-    this.width = opts.width||this._textureW;
-    this.height = opts.height||this._textureH;
-    this.regX = this.width>>1;
-    this.regY = this.height>>1;
-    this.setBound(null,true);
+    this.width = opts.width || this._textureW;
+    this.height = opts.height || this._textureH;
+    this.regX = this.width >> 1;
+    this.regY = this.height >> 1;
+    this.setBound(null, true);
 };
 
 /**
-*
-* Renders the object using the WebGL renderer
-*
-* @param renderer {PIXI.WebGLRenderer}
-* @private
-*/
-Sprite.prototype._renderWebGL = function (renderer){
+ *
+ * Renders the object using the WebGL renderer
+ *
+ * @param renderer {PIXI.WebGLRenderer}
+ * @private
+ */
+Sprite.prototype.render = function(renderer) {
     renderer.setObjectRenderer(renderer.plugins.sprite);
     renderer.plugins.sprite.render(this);
 };
@@ -188,7 +174,7 @@ Sprite.prototype._renderWebGL = function (renderer){
  * @param matrix {PIXI.Matrix} the transformation matrix of the sprite
  * @return {PIXI.Rectangle} the framing rectangle
  */
-Sprite.prototype.getBounds = function (matrix){
+Sprite.prototype.getBounds = function(matrix) {
 
 };
 
@@ -196,16 +182,12 @@ Sprite.prototype.getBounds = function (matrix){
  * Gets the local bounds of the sprite object.
  *
  */
-Sprite.prototype.getLocalBounds = function ()
-{
-};
+Sprite.prototype.getLocalBounds = function() {};
 
 /**
-* Tests if a point is inside this sprite
-*
-* @param point {PIXI.Point} the point to test
-* @return {boolean} the result of the test
-*/
-Sprite.prototype.containsPoint = function( point )
-{
-};
+ * Tests if a point is inside this sprite
+ *
+ * @param point {PIXI.Point} the point to test
+ * @return {boolean} the result of the test
+ */
+Sprite.prototype.containsPoint = function(point) {};

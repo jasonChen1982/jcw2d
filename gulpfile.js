@@ -12,6 +12,15 @@ gulp.task('build', function() {
     .pipe(include())
     .pipe(uglify())
     .pipe(sourcemaps.write('../maps'))
+    .pipe(gulp.dest(path.dirname(pkg.main)));
+});
+
+gulp.task('release', function() {
+  return gulp.src('src/jcw2d.js')
+    .pipe(sourcemaps.init())
+    .pipe(include())
+    .pipe(uglify())
+    .pipe(sourcemaps.write('../maps'))
     .pipe(gulp.dest(path.dirname(pkg.main)))
     .pipe(gulp.dest(pkg.upto));
 });
@@ -20,6 +29,6 @@ var jsdoc = require('gulp-jsdoc3');
 var jsdocConf = require('./gulp_jsdoc.json');
 
 gulp.task('doc', function (cb) {
-    gulp.src(['README.md', 'src/modules/*.js'], {read: false})
+    gulp.src(['README.md', 'src/modules/**/*.js'], {read: false})
         .pipe(jsdoc(jsdocConf,cb));
 });

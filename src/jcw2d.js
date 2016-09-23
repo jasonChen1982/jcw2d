@@ -27,9 +27,21 @@
 
     //=include modules/animation.js
 
-    //=include modules/texture.js
+    //=include modules/math/point.js
+    //=include modules/math/matrix.js
 
-    //=include modules/jcw2d.js
+    //=include modules/textures/baseTexture.js
+    //=include modules/textures/texture.js
+    //=include modules/textures/textureUvs.js
+
+    //=include modules/display/display.js
+    //=include modules/display/container.js
+
+    //=include modules/sprite/sprite.js
+
+    //=include modules/particles/particleContainer.js
+
+    //=include modules/text/text.js
 
     return JC;
 
