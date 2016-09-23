@@ -1,11 +1,10 @@
-
 /**
  * 矩阵对象，用来描述和记录对象的tansform 状态信息
  *
  * @class
  * @memberof JC
  */
-function Matrix(){
+function Matrix() {
     this.a = 1;
     this.b = 0;
     this.c = 0;
@@ -21,7 +20,7 @@ Matrix.prototype.constructor = JC.Matrix;
  *
  * @param array {number[]}
  */
-Matrix.prototype.fromArray = function(array){
+Matrix.prototype.fromArray = function(array) {
     this.a = array[0];
     this.b = array[1];
     this.c = array[3];
@@ -36,11 +35,11 @@ Matrix.prototype.fromArray = function(array){
  * @param transpose {boolean} 是否对矩阵进行转置
  * @return {number[]} 返回数组
  */
-Matrix.prototype.toArray = function(transpose){
-    if(!this.array) this.array = new JC.Float32Array(9);
+Matrix.prototype.toArray = function(transpose) {
+    if (!this.array) this.array = new JC.Float32Array(9);
     var array = this.array;
 
-    if(transpose){
+    if (transpose) {
         array[0] = this.a;
         array[1] = this.b;
         array[2] = 0;
@@ -50,7 +49,7 @@ Matrix.prototype.toArray = function(transpose){
         array[6] = this.tx;
         array[7] = this.ty;
         array[8] = 1;
-    }else{
+    } else {
         array[0] = this.a;
         array[1] = this.c;
         array[2] = this.tx;
@@ -71,7 +70,7 @@ Matrix.prototype.toArray = function(transpose){
  * @param newPos {object} 变换之后的点
  * @return {object} 返回数组
  */
-Matrix.prototype.apply = function(pos, newPos){
+Matrix.prototype.apply = function(pos, newPos) {
     newPos = newPos || {};
     newPos.x = this.a * pos.x + this.c * pos.y + this.tx;
     newPos.y = this.b * pos.x + this.d * pos.y + this.ty;
@@ -84,7 +83,7 @@ Matrix.prototype.apply = function(pos, newPos){
  * @param newPos {object} 变换之后的点
  * @return {object} 变换之后的点
  */
-Matrix.prototype.applyInverse = function(pos, newPos){
+Matrix.prototype.applyInverse = function(pos, newPos) {
     var id = 1 / (this.a * this.d + this.c * -this.b);
     newPos.x = this.d * id * pos.x + -this.c * id * pos.y + (this.ty * this.c - this.tx * this.d) * id;
     newPos.y = this.a * id * pos.y + -this.b * id * pos.x + (-this.ty * this.a + this.tx * this.b) * id;
@@ -95,7 +94,7 @@ Matrix.prototype.applyInverse = function(pos, newPos){
  *
  * @return {this} 
  */
-Matrix.prototype.translate = function(x, y){
+Matrix.prototype.translate = function(x, y) {
     this.tx += x;
     this.ty += y;
     return this;
@@ -105,7 +104,7 @@ Matrix.prototype.translate = function(x, y){
  *
  * @return {this} 
  */
-Matrix.prototype.scale = function(x, y){
+Matrix.prototype.scale = function(x, y) {
     this.a *= x;
     this.d *= y;
     this.c *= x;
@@ -119,16 +118,16 @@ Matrix.prototype.scale = function(x, y){
  *
  * @return {this} 
  */
-Matrix.prototype.rotate = function(angle){
-    var cos = Math.cos( angle );
-    var sin = Math.sin( angle );
+Matrix.prototype.rotate = function(angle) {
+    var cos = Math.cos(angle);
+    var sin = Math.sin(angle);
     var a1 = this.a;
     var c1 = this.c;
     var tx1 = this.tx;
-    this.a = a1 * cos-this.b * sin;
-    this.b = a1 * sin+this.b * cos;
-    this.c = c1 * cos-this.d * sin;
-    this.d = c1 * sin+this.d * cos;
+    this.a = a1 * cos - this.b * sin;
+    this.b = a1 * sin + this.b * cos;
+    this.c = c1 * cos - this.d * sin;
+    this.d = c1 * sin + this.d * cos;
     this.tx = tx1 * cos - this.ty * sin;
     this.ty = tx1 * sin + this.ty * cos;
     return this;
@@ -138,15 +137,15 @@ Matrix.prototype.rotate = function(angle){
  *
  * @return {this} 
  */
-Matrix.prototype.append = function(matrix){
+Matrix.prototype.append = function(matrix) {
     var a1 = this.a;
     var b1 = this.b;
     var c1 = this.c;
     var d1 = this.d;
-    this.a  = matrix.a * a1 + matrix.b * c1;
-    this.b  = matrix.a * b1 + matrix.b * d1;
-    this.c  = matrix.c * a1 + matrix.d * c1;
-    this.d  = matrix.c * b1 + matrix.d * d1;
+    this.a = matrix.a * a1 + matrix.b * c1;
+    this.b = matrix.a * b1 + matrix.b * d1;
+    this.c = matrix.c * a1 + matrix.d * c1;
+    this.d = matrix.c * b1 + matrix.d * d1;
     this.tx = matrix.tx * a1 + matrix.ty * c1 + this.tx;
     this.ty = matrix.tx * b1 + matrix.ty * d1 + this.ty;
     return this;
@@ -156,7 +155,7 @@ Matrix.prototype.append = function(matrix){
  *
  * @return {this} 
  */
-Matrix.prototype.identity = function(){
+Matrix.prototype.identity = function() {
     this.a = 1;
     this.b = 0;
     this.c = 0;
@@ -170,29 +169,28 @@ Matrix.prototype.identity = function(){
  *
  * @return {this} 
  */
-Matrix.prototype.setTransform = function (x, y, pivotX, pivotY, scaleX, scaleY, rotation, skewX, skewY)
-{
+Matrix.prototype.setTransform = function(x, y, pivotX, pivotY, scaleX, scaleY, rotation, skewX, skewY) {
     var a, b, c, d, sr, cr, cy, sy, nsx, cx;
 
-    sr  = Math.sin(rotation);
-    cr  = Math.cos(rotation);
-    cy  = Math.cos(skewY);
-    sy  = Math.sin(skewY);
+    sr = Math.sin(rotation);
+    cr = Math.cos(rotation);
+    cy = Math.cos(skewY);
+    sy = Math.sin(skewY);
     nsx = -Math.sin(skewX);
-    cx  =  Math.cos(skewX);
+    cx = Math.cos(skewX);
 
-    a  =  cr * scaleX;
-    b  =  sr * scaleX;
-    c  = -sr * scaleY;
-    d  =  cr * scaleY;
+    a = cr * scaleX;
+    b = sr * scaleX;
+    c = -sr * scaleY;
+    d = cr * scaleY;
 
-    this.a  = cy * a + sy * c;
-    this.b  = cy * b + sy * d;
-    this.c  = nsx * a + cx * c;
-    this.d  = nsx * b + cx * d;
+    this.a = cy * a + sy * c;
+    this.b = cy * b + sy * d;
+    this.c = nsx * a + cx * c;
+    this.d = nsx * b + cx * d;
 
-    this.tx = x + ( pivotX * a + pivotY * c );
-    this.ty = y + ( pivotX * b + pivotY * d );
+    this.tx = x + (pivotX * a + pivotY * c);
+    this.ty = y + (pivotX * b + pivotY * d);
 
     return this;
 };

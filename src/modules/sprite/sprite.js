@@ -1,73 +1,22 @@
 function Sprite(texture) {
     JC.Container.call(this);
 
-    /**
-     * The anchor sets the origin point of the texture.
-     * The default is 0,0 this means the texture's origin is the top left
-     * Setting the anchor to 0.5,0.5 means the texture's origin is centered
-     * Setting the anchor to 1,1 would mean the texture's origin point will be the bottom right corner
-     *
-     * @member {PIXI.Point}
-     */
     this.anchor = new JC.Point();
 
-    /**
-     * The texture that the sprite is using
-     *
-     * @member {PIXI.Texture}
-     * @private
-     */
     this._texture = null;
 
-    /**
-     * The width of the sprite (this is initially set by the texture)
-     *
-     * @member {number}
-     * @private
-     */
     this._width = 0;
 
-    /**
-     * The height of the sprite (this is initially set by the texture)
-     *
-     * @member {number}
-     * @private
-     */
     this._height = 0;
 
-    /**
-     * The tint applied to the sprite. This is a hex value. A value of 0xFFFFFF will remove any tint effect.
-     *
-     * @member {number}
-     * @default 0xFFFFFF
-     */
     this.tint = 0xFFFFFF;
 
-    /**
-     * The blend mode to be applied to the sprite. Apply a value of `PIXI.BLEND_MODES.NORMAL` to reset the blend mode.
-     *
-     * @member {number}
-     * @default PIXI.BLEND_MODES.NORMAL
-     * @see PIXI.BLEND_MODES
-     */
     this.blendMode = JC.CONST.BLEND_MODES.NORMAL;
 
-    /**
-     * The shader that will be used to render the sprite. Set to null to remove a current shader.
-     *
-     * @member {PIXI.AbstractFilter|PIXI.Shader}
-     */
     this.shader = null;
 
-    /**
-     * An internal cached value of the tint.
-     *
-     * @member {number}
-     * @default 0xFFFFFF
-     */
     this.cachedTint = 0xFFFFFF;
 
-    // call texture setter
     this.texture = texture;
 }
 
@@ -132,9 +81,13 @@ Object.defineProperties(Sprite.prototype, {
             if (value) {
                 // wait for the texture to load
                 if (value.baseTexture.hasLoaded) {
-                    this._onTextureUpdate();
+                    this.upTexture();
                 } else {
-                    value.once('update', this._onTextureUpdate, this);
+                    var This = this;
+                    value.on('load', function() {
+                        This.upTexture(opts);
+                        This._ready = true;
+                    });
                 }
             }
         }
@@ -163,7 +116,7 @@ Sprite.prototype.upTexture = function() {
  * @param renderer {PIXI.WebGLRenderer}
  * @private
  */
-Sprite.prototype.render = function(renderer) {
+Sprite.prototype.render = function(session) {
     renderer.setObjectRenderer(renderer.plugins.sprite);
     renderer.plugins.sprite.render(this);
 };

@@ -1,4 +1,3 @@
-
 /**
  * 动画对象的基本类型
  *
@@ -7,44 +6,44 @@
  * @param [opts] {object} 动画配置信息
  */
 
-function Animate(opts){
-    this.element = opts.element||{};
-    this.duration = opts.duration||300;
+function Animate(opts) {
+    this.element = opts.element || {};
+    this.duration = opts.duration || 300;
     this.living = true;
 
-    this.onCompelete = opts.onCompelete||null;
-    this.onUpdate = opts.onUpdate||null;
+    this.onCompelete = opts.onCompelete || null;
+    this.onUpdate = opts.onUpdate || null;
 
-    this.infinity = opts.infinity||false;
-    this.alternate = opts.alternate||false;
-    this.ease = opts.ease||'easeBoth';
-    this.repeats = opts.repeats||0;
-    this.delay = opts.delay||0;
-    this.progress = 0-this.delay;
+    this.infinity = opts.infinity || false;
+    this.alternate = opts.alternate || false;
+    this.ease = opts.ease || 'easeBoth';
+    this.repeats = opts.repeats || 0;
+    this.delay = opts.delay || 0;
+    this.progress = 0 - this.delay;
 
-    this.timeScale = opts.timeScale||1;
+    this.timeScale = opts.timeScale || 1;
 
     this.paused = false;
 }
 JC.Animate = Animate;
-Animate.prototype.nextPose = function(){
+Animate.prototype.nextPose = function() {
     var cache = {};
-    for(var i in this.ATRE){
-        cache[i] = JC.TWEEN[this.ease]( this.progress , this.ATRS[i] , this.ATRE[i] - this.ATRS[i] , this.duration );
-        if(this.element[i]!==undefined)this.element[i] = cache[i];
+    for (var i in this.ATRE) {
+        cache[i] = JC.TWEEN[this.ease](this.progress, this.ATRS[i], this.ATRE[i] - this.ATRS[i], this.duration);
+        if (this.element[i] !== undefined) this.element[i] = cache[i];
     }
-    return cache;//this.onUpdate
+    return cache; //this.onUpdate
 };
-Animate.prototype.pause = function(){
+Animate.prototype.pause = function() {
     this.paused = true;
 };
-Animate.prototype.start = function(){
+Animate.prototype.start = function() {
     this.paused = false;
 };
-Animate.prototype.stop = function(){
+Animate.prototype.stop = function() {
     this.progress = this.duration;
 };
-Animate.prototype.cancle = function(){
+Animate.prototype.cancle = function() {
     this.living = false;
 };
 
@@ -57,39 +56,39 @@ Animate.prototype.cancle = function(){
  * @param [opts] {object} 动画所具备的特性
  */
 
-function Transition(opts){
-    JC.Animate.call(this,opts);
+function Transition(opts) {
+    JC.Animate.call(this, opts);
 
     this.ATRS = opts.from;
     this.ATRE = opts.to;
 }
 JC.Transition = Transition;
-Transition.prototype = Object.create( JC.Animate.prototype );
+Transition.prototype = Object.create(JC.Animate.prototype);
 Transition.prototype.constructor = JC.Transition;
-Transition.prototype.update = function(snippet){
-    if(this.paused||!this.living)return;
-    this.progress += this.timeScale*snippet;
+Transition.prototype.update = function(snippet) {
+    if (this.paused || !this.living) return;
+    this.progress += this.timeScale * snippet;
 
-    if(this.progress < this.duration){
-        if(this.progress<0)return;
+    if (this.progress < this.duration) {
+        if (this.progress < 0) return;
         var pose = this.nextPose();
-        this.onUpdate&&this.onUpdate(pose,this.progress/this.duration);
-    }else{
+        this.onUpdate && this.onUpdate(pose, this.progress / this.duration);
+    } else {
         this.element.setVal(this.ATRE);
-        this.onUpdate&&this.onUpdate(this.ATRE,1);
-        if(this.repeats>0||this.infinity){
-            this.repeats>0&&--this.repeats;
+        this.onUpdate && this.onUpdate(this.ATRE, 1);
+        if (this.repeats > 0 || this.infinity) {
+            this.repeats > 0 && --this.repeats;
             this.progress = 0;
-            if(this.alternate){
+            if (this.alternate) {
                 var sc = JC.copyJSON(this.ATRS);
                 this.ATRS = JC.copyJSON(this.ATRE);
                 this.ATRE = sc;
-            }else{
+            } else {
                 this.element.setVal(this.ATRS);
             }
-        }else{
+        } else {
             this.living = false;
-            this.onCompelete&&this.onCompelete();
+            this.onCompelete && this.onCompelete();
         }
     }
 };
@@ -102,8 +101,8 @@ Transition.prototype.update = function(snippet){
  * @memberof JC
  * @param [opts] {object} 动画配置信息
  */
-function Animation(opts){
-    JC.Animate.call(this,opts);
+function Animation(opts) {
+    JC.Animate.call(this, opts);
 
     this._keyframes = opts.keys;
     this._keyIndex = 0;
@@ -113,42 +112,42 @@ function Animation(opts){
     this.configKey();
 }
 JC.Animation = Animation;
-Animation.prototype = Object.create( JC.Animate.prototype );
+Animation.prototype = Object.create(JC.Animate.prototype);
 Animation.prototype.constructor = JC.Animation;
-Animation.prototype.configKey = function(){
+Animation.prototype.configKey = function() {
     this.ATRS = this._keyframes[this._keyIndex];
     this._keyIndex += this._direction;
     this.ATRE = this._keyframes[this._keyIndex];
-    var config = this._keyConfig[Math.min(this._keyIndex,this._keyIndex-this._direction)]||{};
-    this.ease = config.ease||this.ease;
-    this.duration = config.duration||this.duration;
+    var config = this._keyConfig[Math.min(this._keyIndex, this._keyIndex - this._direction)] || {};
+    this.ease = config.ease || this.ease;
+    this.duration = config.duration || this.duration;
     this.progress = 0;
 };
-Animation.prototype.update = function(snippet){
-    if(this.paused||!this.living)return;
-    this.progress += this.timeScale*snippet;
+Animation.prototype.update = function(snippet) {
+    if (this.paused || !this.living) return;
+    this.progress += this.timeScale * snippet;
 
-    if(this.progress < this.duration){
-        if(this.progress<0)return;
+    if (this.progress < this.duration) {
+        if (this.progress < 0) return;
         var pose = this.nextPose();
-        this.onUpdate&&this.onUpdate(pose,this.progress/this.duration,this._keyIndex);
-    }else{
+        this.onUpdate && this.onUpdate(pose, this.progress / this.duration, this._keyIndex);
+    } else {
         this.element.setVal(this.ATRE);
-        this.onUpdate&&this.onUpdate(this.ATRE,1,this._keyIndex);
-        if(this._keyIndex<this._keyframes.length-1&&this._keyIndex>0){
+        this.onUpdate && this.onUpdate(this.ATRE, 1, this._keyIndex);
+        if (this._keyIndex < this._keyframes.length - 1 && this._keyIndex > 0) {
             this.configKey();
-        }else{
-            if(this.repeats>0||this.infinity){
-                this.repeats>0&&--this.repeats;
-                if(this.alternate){
+        } else {
+            if (this.repeats > 0 || this.infinity) {
+                this.repeats > 0 && --this.repeats;
+                if (this.alternate) {
                     this._direction *= -1;
-                }else{
+                } else {
                     this._keyIndex = 0;
                 }
                 this.configKey();
-            }else{
+            } else {
                 this.living = false;
-                this.onCompelete&&this.onCompelete();
+                this.onCompelete && this.onCompelete();
             }
         }
     }
@@ -163,7 +162,7 @@ Animation.prototype.update = function(snippet){
  * @param [element] {object} 动画对象 内部传入
  * @param [opts] {object} 动画配置信息 内部传入
  */
-function MovieClip(element, opts){
+function MovieClip(element, opts) {
     this.element = element;
     this.living = false;
 
@@ -174,13 +173,13 @@ function MovieClip(element, opts){
     this.alternate = false;
     this.repeats = 0;
 
-    this.animations = opts.animations||{};
+    this.animations = opts.animations || {};
 
     this.index = 0;
     this.direction = 1;
     this.frames = [];
-    this.sy = opts.sy||0;
-    this.sx = opts.sx||0;
+    this.sy = opts.sy || 0;
+    this.sx = opts.sx || 0;
     this.fillMode = 0;
     this.fps = 16;
 
@@ -190,93 +189,93 @@ function MovieClip(element, opts){
     this.nt = 0;
 }
 JC.MovieClip = MovieClip;
-MovieClip.prototype.update = function(snippet){
-    if(this.paused||!this.living)return;
+MovieClip.prototype.update = function(snippet) {
+    if (this.paused || !this.living) return;
     this.nt += snippet;
-    if(this.nt-this.pt<this.interval)return;
+    if (this.nt - this.pt < this.interval) return;
     this.pt = this.nt;
     var i = this.index + this.direction;
-    if(i<this.frames.length&&i>=0){
+    if (i < this.frames.length && i >= 0) {
         this.index = i;
         // Do you need this handler???
         // this.onUpdate&&this.onUpdate(this.index);
-    }else{
-        if(this.repeats>0||this.infinity){
-            this.repeats>0&&--this.repeats;
-            if(this.alternate){
+    } else {
+        if (this.repeats > 0 || this.infinity) {
+            this.repeats > 0 && --this.repeats;
+            if (this.alternate) {
                 this.direction *= -1;
                 this.index += this.direction;
-            }else{
+            } else {
                 this.direction = 1;
                 this.index = 0;
             }
             // Do you need this handler???
             // this.onUpdate&&this.onUpdate(this.index);
-        }else{
+        } else {
             this.living = false;
             this.index = this.fillMode;
-            this.onCompelete&&this.onCompelete();
-            this.next&&this.next();
+            this.onCompelete && this.onCompelete();
+            this.next && this.next();
         }
     }
 };
-MovieClip.prototype.getFramePos = function(){
+MovieClip.prototype.getFramePos = function() {
     var pos = {
-            x: this.sx,
-            y: this.sy
-        };
+        x: this.sx,
+        y: this.sy
+    };
     var cf = this.frames[this.index];
-    if(cf>0){
-        var row = this.element._textureW/this.element.width >> 0;
-        var lintRow = this.sx/this.element.width >> 0;
-        var lintCol = this.sy/this.element.height >> 0;
-        var mCol = lintCol+(lintRow+cf)/row >> 0;
-        var mRow = (lintRow+cf)%row;
-        pos.x = mRow*this.element.width;
-        pos.y = mCol*this.element.height;
+    if (cf > 0) {
+        var row = this.element._textureW / this.element.width >> 0;
+        var lintRow = this.sx / this.element.width >> 0;
+        var lintCol = this.sy / this.element.height >> 0;
+        var mCol = lintCol + (lintRow + cf) / row >> 0;
+        var mRow = (lintRow + cf) % row;
+        pos.x = mRow * this.element.width;
+        pos.y = mCol * this.element.height;
     }
     return pos;
 };
-MovieClip.prototype.playMovie = function(opts){
+MovieClip.prototype.playMovie = function(opts) {
     this.next = null;
     var movie = this.format(opts.movie);
-    if(!JC.isArray(movie))return;
+    if (!JC.isArray(movie)) return;
     this.frames = movie;
     this.index = 0;
     this.direction = 1;
-    this.fillMode = opts.fillMode||0;
-    this.fps = opts.fps||this.fps;
-    this.infinity = opts.infinity||false;
-    this.alternate = opts.alternate||false;
-    this.repeats = opts.repeats||0;
+    this.fillMode = opts.fillMode || 0;
+    this.fps = opts.fps || this.fps;
+    this.infinity = opts.infinity || false;
+    this.alternate = opts.alternate || false;
+    this.repeats = opts.repeats || 0;
     this.living = true;
-    this.onCompelete = opts.onCompelete||null;
+    this.onCompelete = opts.onCompelete || null;
 };
-MovieClip.prototype.format = function(movie){
-    if(JC.isString(movie)){
+MovieClip.prototype.format = function(movie) {
+    if (JC.isString(movie)) {
         var config = this.animations[movie];
-        if(config){
+        if (config) {
             return this.format(config);
-        }else{
+        } else {
             console.warn(
-            '%c JC.MovieClip warn %c: you didn\`t config %c'+movie+'%c in animations ',
-            'color: #f98165; background: #80a89e',
-            'color: #80a89e; background: #cad9d5;',
-            'color: #f98165; background: #cad9d5',
-            'color: #80a89e; background: #cad9d5'
+                '%c JC.MovieClip warn %c: you didn\`t config %c' + movie + '%c in animations ',
+                'color: #f98165; background: #80a89e',
+                'color: #80a89e; background: #cad9d5;',
+                'color: #f98165; background: #cad9d5',
+                'color: #80a89e; background: #cad9d5'
             );
             return false;
         }
-    }else if(JC.isArray(movie)){
+    } else if (JC.isArray(movie)) {
         return movie;
-    }else if(JC.isObject(movie)){
+    } else if (JC.isObject(movie)) {
         var arr = [];
-        for(var i=movie.start;i<=movie.end;i++){
+        for (var i = movie.start; i <= movie.end; i++) {
             arr.push(i);
         }
-        if(movie.next&&this.animations[movie.next]){
+        if (movie.next && this.animations[movie.next]) {
             var This = this;
-            this.next = function(){
+            this.next = function() {
                 This.playMovie({
                     movie: this.animations[movie.next],
                     infinity: true
@@ -286,18 +285,18 @@ MovieClip.prototype.format = function(movie){
         return arr;
     }
 };
-MovieClip.prototype.pause = function(){
+MovieClip.prototype.pause = function() {
     this.paused = true;
 };
-MovieClip.prototype.start = function(){
+MovieClip.prototype.start = function() {
     this.paused = false;
 };
-MovieClip.prototype.cancle = function(){
+MovieClip.prototype.cancle = function() {
     this.living = false;
 };
 Object.defineProperty(MovieClip.prototype, 'interval', {
     get: function() {
-        return this.fps>0?1000/this.fps>>0:16;
+        return this.fps > 0 ? 1000 / this.fps >> 0 : 16;
     }
 });
 
@@ -311,60 +310,60 @@ Object.defineProperty(MovieClip.prototype, 'interval', {
  * @param [opts] {object} 动画配置信息
  */
 
-function PathMotion(opts){
-    JC.Animate.call(this,opts);
+function PathMotion(opts) {
+    JC.Animate.call(this, opts);
 
     this.points = opts.points;
-    this.attachNormal = opts.attachNormal||false;
+    this.attachNormal = opts.attachNormal || false;
     this.sDeg = false;
     this.tDeg = 0;
     this.pDeg = 0;
 }
 JC.PathMotion = PathMotion;
-PathMotion.prototype = Object.create( JC.Animate.prototype );
+PathMotion.prototype = Object.create(JC.Animate.prototype);
 PathMotion.prototype.constructor = JC.PathMotion;
-PathMotion.prototype.update = function(snippet){
-    if(this.paused||!this.living)return;
-    this.progress += this.timeScale*snippet;
+PathMotion.prototype.update = function(snippet) {
+    if (this.paused || !this.living) return;
+    this.progress += this.timeScale * snippet;
 
-    if(this.progress < this.duration){
-        if(this.progress<0)return;
+    if (this.progress < this.duration) {
+        if (this.progress < 0) return;
         var pose = this.nextPose();
-        this.onUpdate&&this.onUpdate(pose,this.progress/this.duration);
-    }else{
+        this.onUpdate && this.onUpdate(pose, this.progress / this.duration);
+    } else {
         this.element.setVal(this.ATRE);
-        this.onUpdate&&this.onUpdate(this.ATRE,1);
-        if(this.repeats>0||this.infinity){
-            this.repeats>0&&--this.repeats;
+        this.onUpdate && this.onUpdate(this.ATRE, 1);
+        if (this.repeats > 0 || this.infinity) {
+            this.repeats > 0 && --this.repeats;
             this.progress = 0;
-            if(this.alternate){
+            if (this.alternate) {
                 var sc = JC.copyJSON(this.ATRS);
                 this.ATRS = JC.copyJSON(this.ATRE);
                 this.ATRE = sc;
-            }else{
+            } else {
                 this.element.setVal(this.ATRS);
             }
-        }else{
+        } else {
             this.living = false;
-            this.onCompelete&&this.onCompelete();
+            this.onCompelete && this.onCompelete();
         }
     }
 };
-PathMotion.prototype.nextPose = function(){
+PathMotion.prototype.nextPose = function() {
     var cache = {};
     // for(var i in this.ATRE){
     //     cache[i] = JC.TWEEN[this.ease]( this.progress , this.ATRS[i] , this.ATRE[i] - this.ATRS[i] , this.duration );
     //     if(this.element[i]!==undefined)this.element[i] = cache[i];
     // }
-    var t = JC.TWEEN[this.ease]( this.progress , 0 , 1 , this.duration );
-    var pos = this.getPoint(t,this.points);
+    var t = JC.TWEEN[this.ease](this.progress, 0, 1, this.duration);
+    var pos = this.getPoint(t, this.points);
     cache.x = pos.x;
     cache.y = pos.y;
     // cache.y = pos.y;
-    if(this.attachNormal){
+    if (this.attachNormal) {
         cache.rotate = this.decomposeRotate(t);
     }
-    return cache;//this.onUpdate
+    return cache; //this.onUpdate
 };
 PathMotion.prototype.getPoint = function(t, points) {
     var a = points,
@@ -388,9 +387,9 @@ PathMotion.prototype.getPoint = function(t, points) {
     }
 };
 PathMotion.prototype.decomposeRotate = function(t) {
-    var p1 = this.getPoint(t,this.points);
-    var p2 = this.getPoint(t+0.01,this.points);
-    var deg = p1.xxxxx+p2.x;
+    var p1 = this.getPoint(t, this.points);
+    var p2 = this.getPoint(t + 0.01, this.points);
+    var deg = p1.xxxxx + p2.x;
 };
 
 /**
@@ -399,31 +398,24 @@ PathMotion.prototype.decomposeRotate = function(t) {
  * @class
  * @memberof JC
  */
-function Animator(){
+function Animator() {
     this.start = false;
     this.animates = [];
 }
 JC.Animator = Animator;
-Animator.prototype.update = function(snippet){
-    for(var i=0;i<this.animates.length;i++){
-        if(!this.animates[i].living)this.animates.splice(i,1);
-        this.animates[i]&&this.animates[i].update(snippet);
+Animator.prototype.update = function(snippet) {
+    for (var i = 0; i < this.animates.length; i++) {
+        if (!this.animates[i].living) this.animates.splice(i, 1);
+        this.animates[i] && this.animates[i].update(snippet);
     }
 };
-Animator.prototype.fromTo = function(opts){
+Animator.prototype.fromTo = function(opts) {
     var animate = new JC.Transition(opts);
     this.animates.push(animate);
     return animate;
 };
-Animator.prototype.keyFrames = function(opts){
+Animator.prototype.keyFrames = function(opts) {
     var animate = new JC.Animation(opts);
     this.animates.push(animate);
     return animate;
 };
-
-
-
-
-
-
-

@@ -49,4 +49,3 @@ function GraphicsShader(shaderManager) {
 
 GraphicsShader.prototype = Object.create(Shader.prototype);
 GraphicsShader.prototype.constructor = GraphicsShader;
-

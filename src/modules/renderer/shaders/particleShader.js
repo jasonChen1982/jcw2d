@@ -38,7 +38,7 @@ function ParticleShader(shaderManager) {
 
     var vertexSrc = [
         'precision lowp float;',
-        
+
         'attribute vec2 aVertexPosition;',
         'attribute vec2 aTextureCoord;',
         'attribute float aAlpha;',

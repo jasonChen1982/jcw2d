@@ -1,4 +1,3 @@
-JC.BaseTextureCache = {};
 function BaseTexture(source, scaleMode) {
     JC.Eventer.call(this);
 
@@ -10,7 +9,7 @@ function BaseTexture(source, scaleMode) {
 
     this.realHeight = 100;
 
-    this.scaleMode = scaleMode || CONST.SCALE_MODES.DEFAULT;
+    this.scaleMode = scaleMode || JC.CONST.SCALE_MODES.DEFAULT;
 
     this.hasLoaded = false;
 
@@ -110,20 +109,16 @@ BaseTexture.prototype._sourceLoaded = function() {
     this.hasLoaded = true;
     this.update();
 };
-BaseTexture.fromImage = function (imageUrl, crossorigin, scaleMode)
-{
-    var baseTexture = JC.BaseTextureCache[imageUrl];
+BaseTexture.fromImage = function(imageUrl, crossorigin, scaleMode) {
+    var baseTexture = JC.UTILS.BaseTextureCache[imageUrl];
 
-    if (crossorigin === undefined && imageUrl.indexOf('data:') !== 0)
-    {
+    if (crossorigin === undefined && imageUrl.indexOf('data:') !== 0) {
         crossorigin = true;
     }
 
-    if (!baseTexture)
-    {
+    if (!baseTexture) {
         var image = new Image();
-        if (crossorigin)
-        {
+        if (crossorigin) {
             image.crossOrigin = '';
         }
 
@@ -132,7 +127,7 @@ BaseTexture.fromImage = function (imageUrl, crossorigin, scaleMode)
 
         image.src = imageUrl;
 
-        JC.BaseTextureCache[imageUrl] = baseTexture;
+        JC.UTILS.BaseTextureCache[imageUrl] = baseTexture;
 
     }
 

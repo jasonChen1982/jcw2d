@@ -328,18 +328,16 @@ Shader.prototype.initSampler2D = function(uniform) {
     this.updateTexture(texture);
 };
 
-Shader.prototype.updateTexture = function (texture){
+Shader.prototype.updateTexture = function(texture) {
     texture = texture.baseTexture || texture;
 
-    if (!texture.hasLoaded)
-    {
+    if (!texture.hasLoaded) {
         return;
     }
 
     var gl = this.gl;
 
-    if (!texture.texture)
-    {
+    if (!texture.texture) {
         texture.texture = gl.createTexture();
         texture.on('update', this.updateTexture, this);
     }
@@ -353,28 +351,22 @@ Shader.prototype.updateTexture = function (texture){
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, texture.scaleMode === JC.SCALE_MODES.LINEAR ? gl.LINEAR : gl.NEAREST);
 
 
-    if (texture.mipmap && texture.isPowerOfTwo)
-    {
+    if (texture.mipmap && texture.isPowerOfTwo) {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, texture.scaleMode === JC.SCALE_MODES.LINEAR ? gl.LINEAR_MIPMAP_LINEAR : gl.NEAREST_MIPMAP_NEAREST);
         gl.generateMipmap(gl.TEXTURE_2D);
-    }
-    else
-    {
+    } else {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, texture.scaleMode === JC.SCALE_MODES.LINEAR ? gl.LINEAR : gl.NEAREST);
     }
 
-    if (!texture.isPowerOfTwo)
-    {
+    if (!texture.isPowerOfTwo) {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    }
-    else
-    {
+    } else {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
     }
 
-    return  texture.texture;
+    return texture.texture;
 };
 
 Shader.prototype._glCompile = function(type, src) {

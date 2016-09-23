@@ -1,5 +1,4 @@
-function ParticleContainer(maxSize, properties, batchSize)
-{
+function ParticleContainer(maxSize, properties, batchSize) {
     JC.Container.call(this);
 
     batchSize = batchSize || 15000; //CONST.SPRITE_BATCH_SIZE; // 2000 is a nice balance between mobile / desktop
@@ -76,9 +75,8 @@ ParticleContainer.prototype.constructor = JC.ParticleContainer;
  *
  * @param properties {object} The properties to be uploaded
  */
-ParticleContainer.prototype.setProperties = function(properties)
-{
-    if ( properties ) {
+ParticleContainer.prototype.setProperties = function(properties) {
+    if (properties) {
         this._properties[0] = 'scale' in properties ? !!properties.scale : this._properties[0];
         this._properties[1] = 'position' in properties ? !!properties.position : this._properties[1];
         this._properties[2] = 'rotation' in properties ? !!properties.rotation : this._properties[2];
@@ -87,20 +85,16 @@ ParticleContainer.prototype.setProperties = function(properties)
     }
 };
 
-ParticleContainer.prototype.updateTransform = function ()
-{
+ParticleContainer.prototype.updateTransform = function() {
 
     this.displayObjectUpdateTransform();
 };
 
-ParticleContainer.prototype.render = function (renderer)
-{
-    if (!this.visible || this.worldAlpha <= 0 || !this.children.length || !this.renderable)
-    {
+ParticleContainer.prototype.render = function(session) {
+    if (!this.visible || this.worldAlpha <= 0 || !this.children.length || !this.renderable) {
         return;
     }
 
-    renderer.setObjectRenderer( renderer.plugins.particle );
-    renderer.plugins.particle.render( this );
+    renderer.setObjectRenderer(renderer.plugins.particle);
+    renderer.plugins.particle.render(this);
 };
-

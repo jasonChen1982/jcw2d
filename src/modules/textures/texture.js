@@ -108,4 +108,3 @@ Texture.fromImage = function(imageUrl, crossorigin, scaleMode) {
 Texture.fromCanvas = function(canvas, scaleMode) {
     return new Texture(BaseTexture.fromCanvas(canvas, scaleMode));
 };
-
