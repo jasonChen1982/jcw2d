@@ -53,16 +53,26 @@ function Renderer(view, options) {
         preserveDrawingBuffer: options.preserveDrawingBuffer
     };
 
-    this.drawCount = 0;
+    // this.drawCount = 0;
 
-    this.shaderManager = new ShaderManager(this);
+    this.shaderManager = new JC.ShaderManager(this);
 
-    this.blendModeManager = new BlendModeManager(this);
+    this.blendModeManager = new JC.BlendModeManager(this);
 
     this._createContext();
     this._initContext();
 
     this._mapGlModes();
+
+
+    this.renderSession = {};
+    this.renderSession.gl = this.gl;
+    this.renderSession.drawCount = 0;
+    this.renderSession.shaderManager = this.shaderManager;
+    this.renderSession.blendModeManager = this.blendModeManager;
+    this.renderSession.renderer = this;
+    this.renderSession.resolution = this.resolution;
+    this.renderSession.projection = this.projection;
 
 }
 
@@ -70,8 +80,6 @@ function Renderer(view, options) {
 JC.Renderer = Renderer;
 Renderer.prototype = Object.create(SystemRenderer.prototype);
 Renderer.prototype.constructor = Renderer;
-
-Renderer.glContextId = 0;
 
 Renderer.prototype._createContext = function() {
     var gl = this.view.getContext('webgl', this._contextOptions) || this.view.getContext('experimental-webgl', this._contextOptions);
@@ -81,8 +89,6 @@ Renderer.prototype._createContext = function() {
         throw new Error('This browser does not support webGL. Try using the canvas renderer');
     }
 
-    this.glContextId = Renderer.glContextId++;
-    gl.id = this.glContextId;
     gl.renderer = this;
 };
 
@@ -107,14 +113,9 @@ Renderer.prototype.render = function(object) {
         return;
     }
 
-    this.drawCount = 0;
-
-    var cacheParent = object.parent;
-    object.parent = this._tempDisplayObjectParent;
+    // this.drawCount = 0;
 
     object.updateTransform();
-
-    object.parent = cacheParent;
 
     var gl = this.gl;
 
@@ -135,7 +136,7 @@ Renderer.prototype.render = function(object) {
 };
 
 Renderer.prototype.renderDisplayObject = function(displayObject) {
-    displayObject.renderWebGL(this);
+    displayObject.render(this.renderSession);
 };
 
 Renderer.prototype.handleContextLost = function(event) {

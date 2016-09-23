@@ -1,5 +1,4 @@
-
-function ShaderManager(renderer){
+function ShaderManager(renderer) {
 
     this.renderer = renderer;
 
@@ -9,8 +8,10 @@ function ShaderManager(renderer){
 
     this.init();
 }
+JC.ShaderManager = ShaderManager;
+ShaderManager.prototype.constructor = JC.ShaderManager;
 
-ShaderManager.prototype.init = function (){
+ShaderManager.prototype.init = function() {
 
     var gl = this.renderer.gl;
 
@@ -24,10 +25,8 @@ ShaderManager.prototype.init = function (){
     };
 };
 
-ShaderManager.prototype.setShader = function (shaderType)
-{
-    if (this.shaderType === shaderType)
-    {
+ShaderManager.prototype.setShader = function(shaderType) {
+    if (this.shaderType === shaderType) {
         return false;
     }
 
@@ -39,4 +38,3 @@ ShaderManager.prototype.setShader = function (shaderType)
 
     return true;
 };
-

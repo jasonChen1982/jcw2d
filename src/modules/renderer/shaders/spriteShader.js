@@ -1,6 +1,5 @@
 function SpriteShader(gl) {
     var uniforms = {
-        uAlpha: { type: '1f', value: 1 },
         uSampler: { type: 'sampler2D', value: 0 },
         projectionMatrix: {
             type: 'mat3',
@@ -15,24 +14,17 @@ function SpriteShader(gl) {
         }
     };
 
-    if (customUniforms) {
-        for (var u in customUniforms) {
-            uniforms[u] = customUniforms[u];
-        }
-    }
-
-
     var attributes = {
-        aVertexPosition: 0,
-        aTextureCoord: 0,
-        aColor: 0
-    };
-
-    if (customAttributes) {
-        for (var a in customAttributes) {
-            attributes[a] = customAttributes[a];
+        aVertexPosition: {
+            size: 2,
+        },
+        aTextureCoord: {
+            size: 2,
+        },
+        aColor: {
+            size: 4,
         }
-    }
+    };
 
     var vertexSrc = [
         'precision lowp float;',
@@ -60,10 +52,9 @@ function SpriteShader(gl) {
         'varying vec4 vColor;',
 
         'uniform sampler2D uSampler;',
-        'uniform float uAlpha;',
 
         'void main(void){',
-        '   gl_FragColor = texture2D(uSampler, vTextureCoord) * vColor * uAlpha;',
+        '   gl_FragColor = texture2D(uSampler, vTextureCoord) * vColor;',
         '}'
     ].join('\n');
 

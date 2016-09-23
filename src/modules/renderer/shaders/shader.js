@@ -43,7 +43,7 @@ Shader.prototype.cacheUniformLocations = function(keys) {
 
 Shader.prototype.cacheAttributeLocations = function(keys) {
     for (var i = 0; i < keys.length; ++i) {
-        this.attributes[keys[i]] = this.gl.getAttribLocation(this.program, keys[i]);
+        this.attributes[keys[i]]._location = this.gl.getAttribLocation(this.program, keys[i]);
     }
 };
 
@@ -178,7 +178,7 @@ Shader.prototype.syncUniform = function(uniform) {
         case 'm2':
         case 'mat2':
         case 'Matrix2fv':
-            gl.uniformMatrix2fv(location, uniform.transpose, value);
+            gl.uniformMatrix2fv(location, uniform.transpose||false, value);
             break;
 
             // Float32Array or JS Array
@@ -186,14 +186,14 @@ Shader.prototype.syncUniform = function(uniform) {
         case 'mat3':
         case 'Matrix3fv':
 
-            gl.uniformMatrix3fv(location, uniform.transpose, value);
+            gl.uniformMatrix3fv(location, uniform.transpose||false, value);
             break;
 
             // Float32Array or JS Array
         case 'm4':
         case 'mat4':
         case 'Matrix4fv':
-            gl.uniformMatrix4fv(location, uniform.transpose, value);
+            gl.uniformMatrix4fv(location, uniform.transpose||false, value);
             break;
 
             // a Color Value
