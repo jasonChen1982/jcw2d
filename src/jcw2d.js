@@ -43,6 +43,13 @@
 
     //=include modules/text/text.js
 
+    //=include modules/renderer/renderer.js
+    //=include modules/manager/shaderManager.js
+    //=include modules/shaders/shader.js
+    //=include modules/shaders/spriteShader.js
+    //=include modules/shaders/particleShader.js
+    //=include modules/shaders/graphicsShader.js
+
     return JC;
 
 }));
