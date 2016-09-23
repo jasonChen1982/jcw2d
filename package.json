@@ -5,7 +5,8 @@
   "upto": "../jcw2d-site/examples/libs",
   "main": "build/jcw2d.js",
   "scripts": {
-    "postversion": "git push origin v$npm_package_version",
+    "preversion": "gulp release && git add -A && git commit -m 'release new version'",
+    "postversion": "git push origin master && git push origin v$npm_package_version",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

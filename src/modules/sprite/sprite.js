@@ -159,18 +159,15 @@ Object.defineProperties(Sprite.prototype, {
  *
  * @private
  */
-Sprite.prototype._onTextureUpdate = function ()
+Sprite.prototype.upTexture = function ()
 {
-    // so if _width is 0 then width was not set..
-    if (this._width)
-    {
-        this.scale.x = utils.sign(this.scale.x) * this._width / this.texture.frame.width;
-    }
-
-    if (this._height)
-    {
-        this.scale.y = utils.sign(this.scale.y) * this._height / this.texture.frame.height;
-    }
+    this._textureW = opts.texture.width;
+    this._textureH = opts.texture.height;
+    this.width = opts.width||this._textureW;
+    this.height = opts.height||this._textureH;
+    this.regX = this.width>>1;
+    this.regY = this.height>>1;
+    this.setBound(null,true);
 };
 
 /**
