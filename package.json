@@ -1,6 +1,6 @@
 {
   "name": "jcw2d",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "webgl 2d 2.5d jc canvas",
   "upto": "../jcw2d-site/examples/libs",
   "main": "build/jcw2d.js",
