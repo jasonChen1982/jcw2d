@@ -295,6 +295,10 @@ JC.UTILS = {
     euclideanModulo: function(n, m){
         return ((n % m) + m) % m;
     },
+    
+    clamp: function(x, a, b) {
+        return (x < a) ? a : ((x > b) ? b : x);
+    },
 
     TextureCache: {},
 

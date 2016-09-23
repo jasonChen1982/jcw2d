@@ -17,11 +17,15 @@
 
     //=include modules/RAF.js
 
-    //=include modules/event.js
+    //=include modules/const.js
+
+    //=include modules/utils.js
 
     //=include modules/tween.js
 
-    //=include modules/math.js
+    //=include modules/event.js
+
+    //=include modules/animation.js
 
     //=include modules/texture.js
 
