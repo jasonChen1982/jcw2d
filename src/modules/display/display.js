@@ -170,8 +170,8 @@ DisplayObject.prototype.updateMe = function() {
         if (this.rotation % 360) {
             if (this.rotation !== this.rotationCache) {
                 this.rotationCache = this.rotation;
-                this._sr = Math.sin(this.rotation * JC.DTR);
-                this._cr = Math.cos(this.rotation * JC.DTR);
+                this._sr = Math.sin(this.rotation * JC.CONST.DTR);
+                this._cr = Math.cos(this.rotation * JC.CONST.DTR);
             }
 
             a = this._cr * this.scaleX;

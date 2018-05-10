@@ -129,13 +129,12 @@ Renderer.prototype.render = function(object) {
     var gl = this.gl;
 
 
-    if (this.clearBeforeRender) {
+    if (this.autoClear) {
         if (this.transparent) {
             gl.clearColor(0, 0, 0, 0);
         } else {
             gl.clearColor(this._backgroundColorRgb[0], this._backgroundColorRgb[1], this._backgroundColorRgb[2], 1);
         }
-
         gl.clear(gl.COLOR_BUFFER_BIT);
     }
 

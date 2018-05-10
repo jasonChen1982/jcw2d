@@ -67,11 +67,11 @@ JC.CONST = {
     DEFAULT_RENDER_OPTIONS: {
         view: null,
         resolution: 1,
-        antialias: false,
+        antialias: true,
         autoResize: false,
         transparent: false,
         backgroundColor: 0x000000,
-        clearBeforeRender: true,
+        autoClear: true,
         preserveDrawingBuffer: false
     },
 

@@ -33,6 +33,8 @@ function Sprite(texture) {
 
     this.texture = texture;
 
+    this.update = false;
+
 }
 
 JC.Sprite = Sprite;
@@ -107,7 +109,7 @@ Sprite.prototype.renderMe = function(session) {
     shader.syncUniforms();
     var gl = session.gl;
 
-    this.initBuffers(gl,shader);
+    if(!this.dynamicBuffer)this.initBuffers(gl,shader);
     this.uploadDynamic(gl);
     this.bindBuffers(gl,shader);
 
@@ -160,20 +162,22 @@ Sprite.prototype.uploadDynamic = function(gl) {
 
     var uvs = this.texture._uvs.get();
 
-    for(var i = 0;i<4;i++){
-        this.dynamicData[i*this.dynamicStride] = this.vertices[i*2];
-        this.dynamicData[i*this.dynamicStride+1] = this.vertices[i*2+1];
+    if(!this.update){
+        for(var i = 0;i<4;i++){
+            this.dynamicData[i*this.dynamicStride] = this.vertices[i*2];
+            this.dynamicData[i*this.dynamicStride+1] = this.vertices[i*2+1];
 
-        this.dynamicData[i*this.dynamicStride+2] = uvs[i*2];
-        this.dynamicData[i*this.dynamicStride+3] = uvs[i*2+1];
+            this.dynamicData[i*this.dynamicStride+2] = uvs[i*2];
+            this.dynamicData[i*this.dynamicStride+3] = uvs[i*2+1];
 
 
-        this.dynamicData[i*this.dynamicStride+4] = this.aColor[0];
-        this.dynamicData[i*this.dynamicStride+5] = this.aColor[1];
-        this.dynamicData[i*this.dynamicStride+6] = this.aColor[2];
-        this.dynamicData[i*this.dynamicStride+7] = this.aColor[3];
+            this.dynamicData[i*this.dynamicStride+4] = this.aColor[0];
+            this.dynamicData[i*this.dynamicStride+5] = this.aColor[1];
+            this.dynamicData[i*this.dynamicStride+6] = this.aColor[2];
+            this.dynamicData[i*this.dynamicStride+7] = this.aColor[3];
+        }
+        this.update = true;
     }
-
     gl.bindBuffer(gl.ARRAY_BUFFER, this.dynamicBuffer);
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.dynamicData);
 

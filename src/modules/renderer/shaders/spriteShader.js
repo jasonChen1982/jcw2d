@@ -27,7 +27,7 @@ function SpriteShader(gl) {
     };
 
     var vertexSrc = [
-        'precision lowp float;',
+        'precision highp float;',
         'attribute vec2 aVertexPosition;',
         'attribute vec2 aTextureCoord;',
         'attribute vec4 aColor;',
@@ -46,7 +46,7 @@ function SpriteShader(gl) {
     ].join('\n');
 
     var fragmentSrc = [
-        'precision lowp float;',
+        'precision highp float;',
 
         'varying vec2 vTextureCoord;',
         'varying vec4 vColor;',
